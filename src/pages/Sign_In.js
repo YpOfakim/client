@@ -24,7 +24,7 @@ console.log(userArray);
     console.log(userFound);
     if (userFound) {
      
-      if (userFound.website === currentPassWord) {
+      if (userFound.password === currentPassWord) {
         // עדכון localStorage
 
         localStorage.setItem('userFound', JSON.stringify(userFound));
@@ -44,22 +44,22 @@ console.log(userArray);
     setCurrentUserName("");
     setCurrentPassWord("");
   };
-  return (
-    <>
-          <h3> LogIn:</h3>
-      <form id="userLogin">
-        <input type="text" placeholder="userName" id="userNameLogin" value={currentUserName}
-          onChange={(e) => setCurrentUserName(e.target.value)} />
-        <input type="text" placeholder="password" id="userNamePassword" value={currentPassWord}
-          onChange={(e) => setCurrentPassWord(e.target.value)}
-        />
-        <button onClick={handleSubmit}>submit</button>
-        <div>{msg}</div>
-      </form>
-      <h3>New? </h3>
-      <Link to="register"> <button> Register</button> </Link>
-    </>
-  );
+  // return (
+  //   <>
+  //         <h3> LogIn:</h3>
+  //     <form id="userLogin">
+  //       <input type="text" placeholder="userName" id="userNameLogin" value={currentUserName}
+  //         onChange={(e) => setCurrentUserName(e.target.value)} />
+  //       <input type="text" placeholder="password" id="userNamePassword" value={currentPassWord}
+  //         onChange={(e) => setCurrentPassWord(e.target.value)}
+  //       />
+  //       <button onClick={handleSubmit}>submit</button>
+  //       <div>{msg}</div>
+  //     </form>
+  //     <h3>New? </h3>
+  //     <Link to="register"> <button> Register</button> </Link>
+  //   </>
+  // );
 }
 
 export default Login;
