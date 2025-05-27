@@ -1,116 +1,124 @@
-import * as React from 'react';
-import { Outlet, NavLink, useNavigate, useParams } from "react-router-dom";
-import { useContext, useState } from 'react';
-import { Routes, Route } from "react-router-dom";
-import Login from './pages/Login';
-import Home from './pages/Home';
-import Todos from './pages/Todos';
-import Albums from './pages/Albums';
-import Posts from './pages/Posts';
-import Register from './pages/Register';
-import Photos from './pages/Photos';
-import Comments from './pages/Comments';
+// import * as React from 'react';
+// import { Outlet, NavLink, useNavigate, useParams } from "react-router-dom";
+// import { useContext, useState } from 'react';
+// import { Routes, Route } from "react-router-dom";
+import Create_Minyan from './pages/Create_Minyan';
+// import Login from './pages/Login';
+// import Home from './pages/Home';
+// import Todos from './pages/Todos';
+// import Albums from './pages/Albums';
+// import Posts from './pages/Posts';
+// import Register from './pages/Register';
+// import Photos from './pages/Photos';
+// import Comments from './pages/Comments';
 function App() {
+
   return (
-    <AuthProvider>
-      <Routes>
-        <Route index element={<Front_Home/>} />
-        <Route path="sign_in" element={<Sign_In />} />
-        <Route path="sign_up" element={<Sign_Up />} />
-        <Route path="home" element={<Home />} />
-        <Route path="create_minyan" element={<Create_Minyan />} />
-        <Route path="search_minyan" element={<Search_Minyan />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="my_notes" element={<My_Notes />} />
-        <Route path="daily_segments_history" element={<Daily_Segments_History />} />
-        <Route path="segments_and_note" element={<Segments_And_Note />} />
-        <Route path="sidur" element={<Sidur />}>
-          <Route path="shaharit" element={<Prayer />} />
-          <Route path="mincha" element={<Prayer />} />
-          <Route path="ma'ariv" element={<Prayer />} />
-        </Route>
-        <Route path="*" element={<NoMatch />} />
-      </Routes>
-    </AuthProvider>
+    <Create_Minyan />
+  //  <Routes>
+  //     <Route path="/" element={<Home />} />
+  //     <Route path="/login" element={<Login />} />
+  //     <Route path="/create_minyan/:userId" element={<Create_Minyan />} />
+  //   </Routes>
+    // <AuthProvider>
+    //   <Routes>
+    //     <Route index element={<Front_Home/>} />
+    //     <Route path="sign_in" element={<Sign_In />} />
+    //     <Route path="sign_up" element={<Sign_Up />} />
+    //     <Route path="home" element={<Home />} />
+    //     <Route path="create_minyan" element={<Create_Minyan />} />
+    //     <Route path="search_minyan" element={<Search_Minyan />} />
+    //     <Route path="profile" element={<Profile />} />
+    //     <Route path="my_notes" element={<My_Notes />} />
+    //     <Route path="daily_segments_history" element={<Daily_Segments_History />} />
+    //     <Route path="segments_and_note" element={<Segments_And_Note />} />
+    //     <Route path="sidur" element={<Sidur />}>
+    //       <Route path="shaharit" element={<Prayer />} />
+    //       <Route path="mincha" element={<Prayer />} />
+    //       <Route path="ma'ariv" element={<Prayer />} />
+    //     </Route>
+    //     <Route path="*" element={<NoMatch />} />
+    //   </Routes>
+    // </AuthProvider>
   );
 }
 
 // New layout for user-specific routes
-const UserLayout = () => {
-  const { userId } = useParams(); // Get userId from URL
-  return (
-    <>
-      <Navigation userId={userId} />
-      <Outlet />
-    </>
-  );
-};
+// const UserLayout = () => {
+//   const { userId } = useParams(); // Get userId from URL
+//   return (
+//     <>
+//       <Navigation userId={userId} />
+//       <Outlet />
+//     </>
+//   );
+// };
 
-const AuthContext = React.createContext(null);
+// const AuthContext = React.createContext(null);
 
-const Navigation = ({ userId }) => {
-  const { token, onLogout } = useContext(AuthContext);
+// const Navigation = ({ userId }) => {
+//   const { token, onLogout } = useContext(AuthContext);
 
-  return (
-    <nav>
-      {userId ? (
-        <>
-          <NavLink to={`todos`}>Todos</NavLink>
-          <NavLink to={`posts`}>Posts</NavLink>
-          <NavLink to={`albums`}>Albums</NavLink>
-        </>
-      ) : (
-        <>
-          <NavLink to="/login">Login</NavLink>
-          <NavLink to="/register">Register</NavLink>
-        </>
-      )}
+//   return (
+//     <nav>
+//       {userId ? (
+//         <>
+//           <NavLink to={`todos`}>Todos</NavLink>
+//           <NavLink to={`posts`}>Posts</NavLink>
+//           <NavLink to={`albums`}>Albums</NavLink>
+//         </>
+//       ) : (
+//         <>
+//           <NavLink to="/login">Login</NavLink>
+//           <NavLink to="/register">Register</NavLink>
+//         </>
+//       )}
 
-      {token && (
-        <button type="button" onClick={onLogout}>
-          Sign Out
-        </button>
-      )}
-    </nav>
-  );
-};
+//       {token && (
+//         <button type="button" onClick={onLogout}>
+//           Sign Out
+//         </button>
+//       )}
+//     </nav>
+//   );
+// };
 
-const AuthProvider = ({ children }) => {
-  const navigate = useNavigate();
-  const [token, setToken] = useState(null);
+// const AuthProvider = ({ children }) => {
+//   const navigate = useNavigate();
+//   const [token, setToken] = useState(null);
 
-  const handleLogin = async () => {
-    const token = 'sample_token'; // Placeholder token
-    setToken(token);
-    navigate('/home');
-  };
+//   const handleLogin = async () => {
+//     const token = 'sample_token'; // Placeholder token
+//     setToken(token);
+//     navigate('/home');
+//   };
 
-  const handleLogout = () => {
-    setToken(null);
-  };
+//   const handleLogout = () => {
+//     setToken(null);
+//   };
 
-  const value = {
-    token,
-    onLogin: handleLogin,
-    onLogout: handleLogout,
-  };
+//   const value = {
+//     token,
+//     onLogin: handleLogin,
+//     onLogout: handleLogout,
+//   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
+//   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+// };
 
-const NoMatch = () => {
-  return <p>There's nothing here: 404!</p>;
-};
+// const NoMatch = () => {
+//   return <p>There's nothing here: 404!</p>;
+// };
 
 export default App;
-export { UserLayout, AuthContext, Navigation, AuthProvider, NoMatch };
-const Front_Home = () => {
-  return (
-    <div>
-      <h1>Welcome to the App</h1>
-      <p>Please log in or register to continue.</p>
-      <NavLink to="/sign_in">Login</NavLink>
-      <NavLink to="/sign_up">Register</NavLink>
-    </div>
-  );
-};
+// export { UserLayout, AuthContext, Navigation, AuthProvider, NoMatch };
+// const Front_Home = () => {
+//   return (
+//     <div>
+//       <h1>Welcome to the App</h1>
+//       <p>Please log in or register to continue.</p>
+//       <NavLink to="/sign_in">Login</NavLink>
+//       <NavLink to="/sign_up">Register</NavLink>
+//     </div>
+//   );
+// };
