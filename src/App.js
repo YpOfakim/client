@@ -3,6 +3,7 @@
 // import { useContext, useState } from 'react';
 // import { Routes, Route } from "react-router-dom";
 import Create_Minyan from './pages/Create_Minyan';
+import Segment_And_Note from './pages/Segment_And_Note';
 // import Login from './pages/Login';
 // import Home from './pages/Home';
 // import Todos from './pages/Todos';
@@ -14,7 +15,7 @@ import Create_Minyan from './pages/Create_Minyan';
 function App() {
 
   return (
-    <Create_Minyan />
+    <Create_Minyan/>
   //  <Routes>
   //     <Route path="/" element={<Home />} />
   //     <Route path="/login" element={<Login />} />
