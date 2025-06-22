@@ -3,6 +3,7 @@
 // import { useContext, useState } from 'react';
 // import { Routes, Route } from "react-router-dom";
 import Create_Minyan from './pages/Create_Minyan';
+import Search_Minyans from './pages/Search_Minyan';
 import Segment_And_Note from './pages/Segment_And_Note';
 // import Login from './pages/Login';
 // import Home from './pages/Home';
@@ -15,32 +16,8 @@ import Segment_And_Note from './pages/Segment_And_Note';
 function App() {
 
   return (
-    <Create_Minyan/>
-  //  <Routes>
-  //     <Route path="/" element={<Home />} />
-  //     <Route path="/login" element={<Login />} />
-  //     <Route path="/create_minyan/:userId" element={<Create_Minyan />} />
-  //   </Routes>
-    // <AuthProvider>
-    //   <Routes>
-    //     <Route index element={<Front_Home/>} />
-    //     <Route path="sign_in" element={<Sign_In />} />
-    //     <Route path="sign_up" element={<Sign_Up />} />
-    //     <Route path="home" element={<Home />} />
-    //     <Route path="create_minyan" element={<Create_Minyan />} />
-    //     <Route path="search_minyan" element={<Search_Minyan />} />
-    //     <Route path="profile" element={<Profile />} />
-    //     <Route path="my_notes" element={<My_Notes />} />
-    //     <Route path="daily_segments_history" element={<Daily_Segments_History />} />
-    //     <Route path="segments_and_note" element={<Segments_And_Note />} />
-    //     <Route path="sidur" element={<Sidur />}>
-    //       <Route path="shaharit" element={<Prayer />} />
-    //       <Route path="mincha" element={<Prayer />} />
-    //       <Route path="ma'ariv" element={<Prayer />} />
-    //     </Route>
-    //     <Route path="*" element={<NoMatch />} />
-    //   </Routes>
-    // </AuthProvider>
+  // <Search_Minyans />
+     <Create_Minyan />
   );
 }
 

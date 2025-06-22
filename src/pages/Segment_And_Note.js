@@ -11,7 +11,7 @@ function Segment_And_Note() {
       setLoading(true);
       try {
         // Replace with your actual API endpoint
-        const response = await fetch('http://localhost:5000/api/daily-segment');
+        const response = await fetch('http://localhost:3001/api/daily-segment');
         const data = await response.json();
         setSegment(data);
         // Load note from localStorage if exists
@@ -49,7 +49,7 @@ function Segment_And_Note() {
           placeholder="Write your note here..."
         />
         <br />
-        <button onClick={handleSaveNote}>Save Note</button>
+        {/* <button onClick={handleSaveNote}>Save Note</button> */}
       </div>
     </div>
   );

@@ -1,79 +1,46 @@
-// import React from 'react';
-// import { Outlet } from 'react-router-dom';
-// import { useParams } from 'react-router-dom';
-// function Create_Minyan() {
-//   const { userId } = useParams(); 
-
-
-
-// //   return (
-// //    <>
-// //    <h3>user {userId}</h3>
-// //    <div>
-// //    </div>
-// //    <Outlet/>
-// //    </>
-// //   );
-// }
-
-// export default Create_Minyan;
 import React, { useEffect, useState } from 'react';
 import { Outlet, useParams } from 'react-router-dom';
+import "../style/minyans.css"; // Assuming you have styles for the minyans
 
-// קבל מיקום משתמש
+const GOOGLE_API_KEY = 'AIzaSyCVdsExOdchWIspVTLcCOgScugWBmgBllw';
+
 function getUserLocation() {
   return new Promise((resolve, reject) => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          resolve({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          });
-        },
-        (error) => {
-          reject(error);
-        }
-      );
-    } else {
-      reject(new Error("Geolocation not available"));
+    if (!navigator.geolocation) {
+      reject(new Error('Geolocation not supported'));
     }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      (err) => reject(err)
+    );
   });
 }
 
-// קבל קואורדינטות מכתובת (OpenStreetMap)
 async function getLatLngFromAddress(address) {
-  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
-  const response = await fetch(url);
-  const data = await response.json();
-  console.log('Nominatim response:', data); // הוסיפי שורה זו
-
-  if (data && data.length > 0) {
-    return {
-      lat: parseFloat(data[0].lat),
-      lng: parseFloat(data[0].lon)
-    };
+  const res = await fetch(`http://localhost:3001/geocode/geocode?address=${encodeURIComponent(address)}`);
+  const data = await res.json();
+  if (data.status === 'OK') {
+    return data.results[0].geometry.location;
   } else {
-    throw new Error("Address not found");
+    throw new Error('Address not found');
   }
 }
 
-// חישוב מרחק וזמן (OpenRouteService)
-async function getDistanceAndDuration(origin, destination, mode = "foot-walking") {
-  const apiKey = "YOUR_OPENROUTESERVICE_API_KEY"; // הכניסי כאן את המפתח שלך
-  const url = `https://api.openrouteservice.org/v2/directions/${mode}?api_key=${apiKey}&start=${origin.lng},${origin.lat}&end=${destination.lng},${destination.lat}`;
+async function getDistanceAndDuration(origin, destination, mode = 'driving') {
+  const originStr = `${origin.lat},${origin.lng}`;
+  const destinationStr = `${destination.lat},${destination.lng}`;
+  const url = `http://localhost:3001/geocode/distance?origin=${encodeURIComponent(originStr)}&destination=${encodeURIComponent(destinationStr)}&mode=${mode}`;
 
-  const response = await fetch(url);
-  const data = await response.json();
-
-  if (data && data.features && data.features.length > 0) {
-    const summary = data.features[0].properties.summary;
+  const res = await fetch(url);
+  const data = await res.json();
+  if (data.status === 'OK' && data.rows[0].elements[0].status === 'OK') {
+    const element = data.rows[0].elements[0];
     return {
-      distance: (summary.distance / 1000).toFixed(2) + " ק\"מ",
-      duration: Math.round(summary.duration / 60) + " דקות"
+      distance: element.distance.text,
+      duration: element.duration.text,
     };
   } else {
-    throw new Error("Could not calculate route");
+    throw new Error('Failed to calculate distance');
   }
 }
 
@@ -81,53 +48,108 @@ function Create_Minyan() {
   const { userId } = useParams();
   const [location, setLocation] = useState(null);
   const [address, setAddress] = useState('');
-  const [addressFrom, setAddressFrom] = useState('');
-  const [addressTo, setAddressTo] = useState('');
-  const [destination, setDestination] = useState(null);
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const [mode, setMode] = useState('walking');
   const [routeInfo, setRouteInfo] = useState(null);
   const [error, setError] = useState('');
-  const [mode, setMode] = useState('foot-walking');
-  const [calcType, setCalcType] = useState('from-location'); // 'from-location' or 'between-addresses'
+  const [success, setSuccess] = useState('');
+  const [time, setTime] = useState('');
+  const [useCurrentLocation, setUseCurrentLocation] = useState(true);
+  const [calcType, setCalcType] = useState('from-location');
 
   useEffect(() => {
     if (calcType === 'from-location') {
       getUserLocation()
         .then(setLocation)
-        .catch((error) => {
-          setError("לא ניתן לקבל מיקום משתמש");
-          console.error(error);
-        });
+        .catch(() => setError('לא ניתן לקבל מיקום'));
     }
   }, [calcType]);
+
+  useEffect(() => {
+    if (error || success) {
+      const timer = setTimeout(() => {
+        setError('');
+        setSuccess('');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, success]);
 
   const handleAddressSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setRouteInfo(null);
     try {
-      let origin, dest;
-      if (calcType === 'from-location') {
-        if (!location) {
-          setError("מיקום משתמש לא ידוע");
-          return;
-        }
-        origin = location;
-        dest = await getLatLngFromAddress(address);
-      } else {
-        origin = await getLatLngFromAddress(addressFrom);
-        dest = await getLatLngFromAddress(addressTo);
-      }
-      setDestination(dest);
-      const info = await getDistanceAndDuration(origin, dest, mode);
+      const origin = calcType === 'from-location' ? location : await getLatLngFromAddress(from);
+      const destination = await getLatLngFromAddress(calcType === 'from-location' ? address : to);
+      const info = await getDistanceAndDuration(origin, destination, mode);
       setRouteInfo(info);
     } catch (err) {
       setError(err.message);
     }
   };
 
+const handleCreateMinyan = async (e) => {
+  e.preventDefault();
+  setError('');
+  setSuccess('');
+
+  if (!time) {
+    setError('נא להזין תאריך ושעה');
+    return;
+  }
+
+  const data = {
+    time,
+    opener_phone: "1234567890",
+    is_daily: false,
+  };
+
+  try {
+    if (useCurrentLocation) {
+      if (!location) {
+        setError('נא לקבל מיקום');
+        return;
+      }
+      data.location = location;  // שולח מיקום
+      data.address = null;
+    } else {
+      if (!address) {
+        setError('נא להזין כתובת');
+        return;
+      }
+      data.address = address;  // שולח כתובת
+      data.location = null;
+    }
+
+    const res = await fetch('http://localhost:3001/minyans', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (res.ok) {
+      setSuccess('מניין נוצר בהצלחה!');
+      setTime('');
+      setAddress('');
+      setLocation(null);
+    } else {
+      const errData = await res.json();
+      setError(errData.error || 'שגיאה ביצירת מניין');
+    }
+  } catch (err) {
+    console.error(err);
+    setError('שגיאת שרת');
+    
+  }
+  
+};
+
+
   return (
     <>
-      <h3>user {userId}</h3>
+      {/* <h3>משתמש: {userId}</h3>
       <div>
         <label>
           <input
@@ -135,65 +157,113 @@ function Create_Minyan() {
             value="from-location"
             checked={calcType === 'from-location'}
             onChange={() => setCalcType('from-location')}
-          />
-          חישוב מהמיקום שלי
+          /> חישוב מהמיקום שלי
         </label>
-        <label style={{marginRight: '1em'}}>
+        <label>
           <input
             type="radio"
             value="between-addresses"
             checked={calcType === 'between-addresses'}
             onChange={() => setCalcType('between-addresses')}
-          />
-          חישוב בין שתי כתובות
-        </label>
-      </div>
-      {calcType === 'from-location' && (
-        <div>
-          {location
-            ? <p>המיקום שלך: Latitude: {location.lat}, Longitude: {location.lng}</p>
-            : <p>בודק מיקום...</p>}
-        </div>
-      )}
-      <form onSubmit={handleAddressSubmit}>
+          /> חישוב בין כתובות
+        </label> */}
+      {/* </div> */}
+
+      {/* <form onSubmit={handleAddressSubmit}>
         {calcType === 'from-location' ? (
           <input
             type="text"
             value={address}
-            onChange={e => setAddress(e.target.value)}
+            onChange={(e) => setAddress(e.target.value)}
             placeholder="הכנס כתובת יעד"
           />
         ) : (
           <>
             <input
               type="text"
-              value={addressFrom}
-              onChange={e => setAddressFrom(e.target.value)}
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
               placeholder="כתובת מוצא"
-              style={{marginLeft: '0.5em'}}
             />
             <input
               type="text"
-              value={addressTo}
-              onChange={e => setAddressTo(e.target.value)}
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
               placeholder="כתובת יעד"
-              style={{marginLeft: '0.5em'}}
+              style={{ marginLeft: '0.5em' }}
             />
           </>
         )}
-        <select value={mode} onChange={e => setMode(e.target.value)} style={{marginLeft: '0.5em'}}>
-          <option value="foot-walking">הליכה</option>
-          <option value="driving-car">נסיעה ברכב</option>
+        <select value={mode} onChange={(e) => setMode(e.target.value)} style={{ marginLeft: '0.5em' }}>
+          <option value="walking">הליכה</option>
+          <option value="driving">רכב</option>
         </select>
-        <button type="submit" style={{marginLeft: '0.5em'}}>חשב מרחק</button>
+        <button type="submit">חשב מרחק</button>
       </form>
+
       {routeInfo && (
         <div>
           <p>מרחק: {routeInfo.distance}</p>
-          <p>זמן {mode === "foot-walking" ? "הליכה" : "נסיעה"}: {routeInfo.duration}</p>
+          <p>זמן: {routeInfo.duration}</p>
         </div>
       )}
-      {error && <div style={{color: 'red'}}>{error}</div>}
+
+      <hr /> */}
+      <h2>צור מניין</h2>
+<form className="create-minyan-form" onSubmit={handleCreateMinyan}>
+  <div>
+  <label>תאריך ושעה: </label>
+  <input
+    type="datetime-local"
+    value={time}
+    onChange={(e) => setTime(e.target.value)}
+    required
+  />
+</div>
+
+
+        <div>
+          <label>
+            <input
+              type="radio"
+              checked={useCurrentLocation}
+              onChange={() => setUseCurrentLocation(true)}
+            /> השתמש במיקום הנוכחי
+          </label>
+          <button
+            type="button"
+            onClick={() => getUserLocation().then(setLocation)}
+            disabled={!useCurrentLocation}
+          >
+            קבל מיקום
+          </button>
+          {location && useCurrentLocation && (
+            <span> (Lat: {location.lat}, Lng: {location.lng})</span>
+          )}
+        </div>
+
+        <div>
+          <label>
+            <input
+              type="radio"
+              checked={!useCurrentLocation}
+              onChange={() => setUseCurrentLocation(false)}
+            /> הזן כתובת
+          </label>
+          <input
+            type="text"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            disabled={useCurrentLocation}
+            placeholder="כתובת"
+          />
+        </div>
+
+        {error && <div style={{ color: 'red' }}>{error}</div>}
+        {success && <div style={{ color: 'green' }}>{success}</div>}
+        <button type="submit">צור מניין</button>
+      </form>
+
       <Outlet />
     </>
   );

@@ -1,124 +1,105 @@
+// 📁 pages/Search_Minyans.jsx
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import Photo_Single from '../components/Photo_Single';
-import AddNew from '../components/AddNew';
-import Modal from '../components/Modal';
-
+import Minyan from '../components/Minyan';
+import "../style/minyans.css"; // Assuming you have styles for the minyans
 function Search_Minyans() {
-  // const { albumNum, userId } = useParams();
   const [minyans, setMinyans] = useState([]);
-  const [selectedMinyan, setSelectedMinyan] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);  // אם יש עוד תמונות להוריד
-  const limit = 4; // מספר התמונות שנביא בכל פעם
-  const start = useRef(0);  // משתנה שמכיל את המיקום שבו הפסקנו בטעינה האחרונה
-  const minyansSetRef = useRef(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [message, setMessage] = useState('');
 
-  // Function to fetch photos from server
-  const fetchMinyans = () => {
-    if (loading || !hasMore) return;  // If we're already loading or there's no more photos, don't fetch
+  const limit = 4;
+  const start = useRef(0);
+  const containerRef = useRef(null);
 
-    setLoading(true);  // Start loading
-    fetch(`http://localhost:3001/minyans?start=${start.current}&_limit=${limit}`)
-      .then((response) => response.json())
-      .then((json) => {
-        setMinyans((prevMinyans) => [...prevMinyans, ...json]); // Add new photos to the list
-        start.current += limit; // Update the start index
-        setLoading(false);
+  // Get user location once
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      pos => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      err => console.error('Location error:', err)
+    );
+  }, []);
 
-        // If the fetched photos are less than the limit, then there are no more photos to load
-        if (json.length < limit) {
-          setHasMore(false);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-      });
-  };
+  // Fetch minyans from server
+  const fetchMinyans = async () => {
+    if (loading || !hasMore) return;
 
-  // Track scrolling and load more photos if we're at the bottom
-  const handleScroll = () => {
-    const container = photosContainerRef.current;
-    if (container.scrollHeight - container.scrollTop === container.clientHeight && hasMore && !loading) {
-      fetchMinyans(); // We're at the bottom, load more photos
+    setLoading(true);
+    try {
+      const res = await fetch(`http://localhost:3001/minyans?start=${start.current}&_limit=${limit}`);
+      const json = await res.json();
+
+      setMinyans(prev => [...prev, ...json]);
+      start.current += limit;
+
+      if (json.length < limit) setHasMore(false);
+      if (json.length === 0 && start.current === limit) {
+        setMessage('לא נמצאו מניינים');
+      }
+    } catch (err) {
+      console.error('Fetch error:', err);
+      setMessage('שגיאה בטעינת מניינים');
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Fetch initial photos when albumNum changes
+  // Hide messages after 3 seconds
   useEffect(() => {
-    setMinyans([]);  // Reset photos when the album changes
-    start.current = 0;  // Reset start position for fetching
-    setHasMore(true);  // Allow loading more photos
-    fetchMinyans();  // Fetch photos based on albumNum
-  },[]);
+    if (message) {
+      const timer = setTimeout(() => setMessage(''), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
-  // Listen for scroll events to trigger fetching more photos
+  // Initial load only once
   useEffect(() => {
-    const container = minyansSetRef.current;
+    fetchMinyans();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Scroll listener
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const nearBottom =
+        container.scrollHeight - container.scrollTop <= container.clientHeight + 100;
+      if (nearBottom) {
+        fetchMinyans();
+      }
+    };
+
     container.addEventListener('scroll', handleScroll);
     return () => container.removeEventListener('scroll', handleScroll);
   }, [loading, hasMore]);
 
-  // Open modal when photo is clicked
-  const handleMinyanClick = (photo) => {
-    setSelectedMinyan(photo);
-  };
-
-  // Close modal
-  const handleClose = () => {
-    setSelectedMinyan(null);
-  };
-
-  // Fields for AddNew component
-  // const photoFields = [
-  //   { name: 'title', label: 'Title' },
-  //   { name: 'url', label: 'URL' },
-  //   { name: 'thumbnailUrl', label: 'Thumbnail URL' },
-  // ];
-
-  // Render the photos and the modal
   return (
-    <>
-      {/* <Link to={`/users/${userId}/posts/`} className="close-link">X</Link> */}
+    <div>
+      <h2 style={{ textAlign: 'center' }}>מניינים קיימים</h2>
+      {message && <div style={{ color: 'red', textAlign: 'center' }}>{message}</div>}
+      <div
+        ref={containerRef}
+        className="minyans-container"
+        style={{
+          overflowY: 'scroll',
+          height: '80vh',
+          border: '1px solid #ccc',
+          padding: '1em',
+        }}
+      >
+        {minyans.length === 0 && !loading && !message && <p>לא נמצאו מניינים</p>}
 
-      <div>
-        {/* <h3>Album No {albumNum}</h3> */}
+        {minyans.map((minyan, index) => (
+          <Minyan key={index} minyan={minyan} userLocation={userLocation} />
+        ))}
 
-        {/* AddNew component for adding new photos */}
-{/* {        <AddNew
-          setItemArray={setPhotos}  // Ensure setItemArray updates the photos state correctly
-          allItemArray={photos}
-          apiEndpoint="/photos"
-          itemFields={photoFields}
-          itemType="Photo"
-          setFiltered={setPhotos}  // Make sure this doesn't overwrite the photos list unexpectedly
-        />} */}
-
-        {/* Container for the photos */}
-        <div 
-          ref={minyansSetRef} 
-          className="minyans-container" 
-          style={{ overflowY: 'scroll', height: '80vh' }}
-        >
-          {minyans.map((minyan, index) => (
-            <Photo_Single
-              key={index}
-              minyan={minyan}
-              minyans={minyans}
-              onClick={() => handleMinyanClick(photo)}  // Open modal on photo click
-              setMinyans={setMinyans}  // This can be removed or refactored if it's unnecessary
-            />
-          ))}
-          {loading && <div>Loading...</div>} {/* Loading indicator */}
-        </div>
+        {loading && <div>טוען מניינים...</div>}
+        {!hasMore && <div style={{ textAlign: 'center', marginTop: '1em' }}>אין עוד מניינים</div>}
       </div>
-
-      {/* Modal component for showing the selected photo */}
-      {selectedMinyan && (
-        <Modal selectedMinyan={selectedMinyan} handleClose={handleClose} />
-      )}
-    </>
+    </div>
   );
 }
 
