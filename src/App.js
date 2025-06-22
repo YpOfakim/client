@@ -1,95 +1,94 @@
-// import * as React from 'react';
-// import { Outlet, NavLink, useNavigate, useParams } from "react-router-dom";
-// import { useContext, useState } from 'react';
-// import { Routes, Route } from "react-router-dom";
+import * as React from 'react';
+import { Outlet, NavLink, useNavigate, useParams } from "react-router-dom";
+import { useContext, useState } from 'react';
+import { Routes, Route } from "react-router-dom";
 import Create_Minyan from './pages/Create_Minyan';
-import Search_Minyans from './pages/Search_Minyan';
+import Navigation from './components/Navigation'; // עדכני לפי הנתיב שלך
+
 import Segment_And_Note from './pages/Segment_And_Note';
-// import Login from './pages/Login';
-// import Home from './pages/Home';
-// import Todos from './pages/Todos';
-// import Albums from './pages/Albums';
-// import Posts from './pages/Posts';
-// import Register from './pages/Register';
-// import Photos from './pages/Photos';
-// import Comments from './pages/Comments';
+import Login from './pages/Login';
+import Home from './pages/Home';
+import Todos from './pages/Todos';
+import Albums from './pages/Albums';
+import Posts from './pages/Posts';
+import Register from './pages/Register';
+import Photos from './pages/Photos';
+import Comments from './pages/Comments';
 function App() {
 
   return (
-  // <Search_Minyans />
-     <Create_Minyan />
+ 
+     <AuthProvider>
+       <Routes>
+         <Route index element={<Front_Home/>} />
+         <Route path="sign_in" element={<Sign_In />} />
+         <Route path="sign_up" element={<Sign_Up />} />
+         
+         {/* עטיפת הדפים שרוצים בהם ניווט */}
+          <Route path="user/:userId" element={<LayoutWithNav />}>
+           <Route path="home" element={<Home />} />
+           <Route path="create_minyan" element={<Create_Minyan />} />
+           <Route path="search_minyan" element={<Search_Minyan />} />
+           <Route path="profile" element={<Profile />} />
+           <Route path="my_notes" element={<My_Notes />} />
+           <Route path="daily_segments_history" element={<Daily_Segments_History />} />
+           <Route path="segments_and_note" element={<Segments_And_Note />} />
+           <Route path="sidur/:prayerName" element={<Sidur />} />
+         </Route>
+         <Route path="*" element={<NoMatch />} />
+       </Routes>
+     </AuthProvider>
   );
 }
 
 // New layout for user-specific routes
-// const UserLayout = () => {
-//   const { userId } = useParams(); // Get userId from URL
-//   return (
-//     <>
-//       <Navigation userId={userId} />
-//       <Outlet />
-//     </>
-//   );
-// };
+const LayoutWithNav = () => {
+  const { userId } = useParams();
 
-// const AuthContext = React.createContext(null);
+  return (
+    <>
+      <Navigation userId={userId} />
+      <main>
+        <Outlet />
+      </main>
+    </>
+  );
+};
+const AuthContext = React.createContext(null);
 
-// const Navigation = ({ userId }) => {
-//   const { token, onLogout } = useContext(AuthContext);
 
-//   return (
-//     <nav>
-//       {userId ? (
-//         <>
-//           <NavLink to={`todos`}>Todos</NavLink>
-//           <NavLink to={`posts`}>Posts</NavLink>
-//           <NavLink to={`albums`}>Albums</NavLink>
-//         </>
-//       ) : (
-//         <>
-//           <NavLink to="/login">Login</NavLink>
-//           <NavLink to="/register">Register</NavLink>
-//         </>
-//       )}
+const AuthProvider = ({ children }) => {
+  const navigate = useNavigate();
+  const [token, setToken] = useState(null);
 
-//       {token && (
-//         <button type="button" onClick={onLogout}>
-//           Sign Out
-//         </button>
-//       )}
-//     </nav>
-//   );
-// };
+  const handleLogin = async () => {
+    const token = 'sample_token'; // Placeholder token
+    setToken(token);
+    navigate('/home');
+  };
 
-// const AuthProvider = ({ children }) => {
-//   const navigate = useNavigate();
-//   const [token, setToken] = useState(null);
+  const handleLogout = () => {
+    setToken(null);
+  };
 
-//   const handleLogin = async () => {
-//     const token = 'sample_token'; // Placeholder token
-//     setToken(token);
-//     navigate('/home');
-//   };
+  const value = {
+    token,
+    onLogin: handleLogin,
+    onLogout: handleLogout,
+  };
 
-//   const handleLogout = () => {
-//     setToken(null);
-//   };
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
 
-//   const value = {
-//     token,
-//     onLogin: handleLogin,
-//     onLogout: handleLogout,
-//   };
-
-//   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-// };
-
-// const NoMatch = () => {
-//   return <p>There's nothing here: 404!</p>;
-// };
+const NoMatch = () => {
+  return <p>There's nothing here: 404!</p>;
+};
 
 export default App;
-// export { UserLayout, AuthContext, Navigation, AuthProvider, NoMatch };
+export {  AuthContext , AuthProvider, NoMatch };
+
+
+
 // const Front_Home = () => {
 //   return (
 //     <div>
