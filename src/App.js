@@ -3,41 +3,43 @@ import { Outlet, NavLink, useNavigate, useParams } from "react-router-dom";
 import { useContext, useState } from 'react';
 import { Routes, Route } from "react-router-dom";
 import Create_Minyan from './pages/Create_Minyan';
-import Navigation from './components/Navigation'; // עדכני לפי הנתיב שלך
+import Navigation from './components/Navigation.js'; // עדכני לפי הנתיב שלך
 
-import Segment_And_Note from './pages/Segment_And_Note';
-import Login from './pages/Login';
-import Home from './pages/Home';
-import Todos from './pages/Todos';
-import Albums from './pages/Albums';
-import Posts from './pages/Posts';
-import Register from './pages/Register';
-import Photos from './pages/Photos';
-import Comments from './pages/Comments';
+// import Segment_And_Note from './pages/Segment_And_Note';
+// import Login from './pages/Login';
+// import Home from './pages/Home';
+// import Todos from './pages/Todos';
+// import Albums from './pages/Albums';
+// import Posts from './pages/Posts';
+// import Register from './pages/Register';
+// import Photos from './pages/Photos';
+// import Comments from './pages/Comments';
+import Search_Minyans from './pages/Search_Minyan.js';
 function App() {
 
   return (
  
-     <AuthProvider>
-       <Routes>
-         <Route index element={<Front_Home/>} />
-         <Route path="sign_in" element={<Sign_In />} />
-         <Route path="sign_up" element={<Sign_Up />} />
+    //  <AuthProvider>
+    //    <Routes>
+    //      <Route index element={<Front_Home/>} />
+    //      <Route path="sign_in" element={<Sign_In />} />
+    //      <Route path="sign_up" element={<Sign_Up />} />
          
-         {/* עטיפת הדפים שרוצים בהם ניווט */}
-          <Route path="user/:userId" element={<LayoutWithNav />}>
-           <Route path="home" element={<Home />} />
-           <Route path="create_minyan" element={<Create_Minyan />} />
-           <Route path="search_minyan" element={<Search_Minyan />} />
-           <Route path="profile" element={<Profile />} />
-           <Route path="my_notes" element={<My_Notes />} />
-           <Route path="daily_segments_history" element={<Daily_Segments_History />} />
-           <Route path="segments_and_note" element={<Segments_And_Note />} />
-           <Route path="sidur/:prayerName" element={<Sidur />} />
-         </Route>
-         <Route path="*" element={<NoMatch />} />
-       </Routes>
-     </AuthProvider>
+    //      {/* עטיפת הדפים שרוצים בהם ניווט */}
+    //       <Route path="user/:userId" element={<LayoutWithNav />}>
+    //        <Route path="home" element={<Home />} />
+    //        <Route path="create_minyan" element={<Create_Minyan />} />
+    //        <Route path="search_minyan" element={<Search_Minyan />} />
+    //        <Route path="profile" element={<Profile />} />
+    //        <Route path="my_notes" element={<My_Notes />} />
+    //        <Route path="daily_segments_history" element={<Daily_Segments_History />} />
+    //        <Route path="segments_and_note" element={<Segments_And_Note />} />
+    //        <Route path="sidur/:prayerName" element={<Sidur />} />
+    //      </Route>
+    //      <Route path="*" element={<NoMatch />} />
+    //    </Routes>
+    //  </AuthProvider>
+<Search_Minyans />
   );
 }
 

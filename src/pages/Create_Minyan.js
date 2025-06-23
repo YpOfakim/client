@@ -103,7 +103,7 @@ const handleCreateMinyan = async (e) => {
   const data = {
     time,
     opener_phone: "1234567890",
-    is_daily: false,
+    is_daily: mode === 'is_daily' ? true : false,
   };
 
   try {
@@ -257,8 +257,14 @@ const handleCreateMinyan = async (e) => {
             disabled={useCurrentLocation}
             placeholder="כתובת"
           />
+          <h6 style={{ color: 'gray' }}> האם המניין יומי?</h6>
         </div>
-
+<input
+          type="checkbox"
+          checked={mode === 'is_daily'}
+          onChange={(e) => setMode(e.target.checked ? 'is_daily' : 'not_daily')}
+          placeholder='האם מניין יומי'
+        />
         {error && <div style={{ color: 'red' }}>{error}</div>}
         {success && <div style={{ color: 'green' }}>{success}</div>}
         <button type="submit">צור מניין</button>
