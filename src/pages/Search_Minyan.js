@@ -1,122 +1,238 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
-
+import Minyan from '../components/Minyan';
+import "../style/minyans.css";
+import SortOptions from '../components/SortOptions';
 
 function Search_Minyans() {
-  // const { albumNum, userId } = useParams();
   const [minyans, setMinyans] = useState([]);
-  const [selectedMinyan, setSelectedMinyan] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
+  const [locationMode, setLocationMode] = useState("current"); // current | manual
+  const [manualAddress, setManualAddress] = useState("");
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);  // אם יש עוד תמונות להוריד
-  const limit = 4; // מספר התמונות שנביא בכל פעם
-  const start = useRef(0);  // משתנה שמכיל את המיקום שבו הפסקנו בטעינה האחרונה
-  const minyansSetRef = useRef(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [message, setMessage] = useState('');
+  const [desiredTime, setDesiredTime] = useState('');
+const [sortBy, setSortBy] = useState('time'); // 'time' או 'distance'
+const [originalMinyans, setOriginalMinyans] = useState([]);
 
-  // Function to fetch photos from server
-  const fetchMinyans = () => {
-    if (loading || !hasMore) return;  // If we're already loading or there's no more photos, don't fetch
+  const limit = 4;
+  const start = useRef(0);
+  const containerRef = useRef(null);
+useEffect(() => {
+  if (!originalMinyans.length) return;
 
-    setLoading(true);  // Start loading
-    fetch(`http://localhost:3001/minyans?start=${start.current}&_limit=${limit}`)
-      .then((response) => response.json())
-      .then((json) => {
-        setMinyans((prevMinyans) => [...prevMinyans, ...json]); // Add new photos to the list
-        start.current += limit; // Update the start index
-        setLoading(false);
+  let sorted = [...originalMinyans];
 
-        // If the fetched photos are less than the limit, then there are no more photos to load
-        if (json.length < limit) {
-          setHasMore(false);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-      });
-  };
+  if (sortBy === 'time') {
+    sorted.sort((a, b) => new Date(a.time_and_date) - new Date(b.time_and_date));
+  } else if (sortBy === 'distance' && userLocation) {
+    sorted.sort((a, b) => {
+      const distA = Math.hypot(a.latitude - userLocation.lat, a.longitude - userLocation.lng);
+      const distB = Math.hypot(b.latitude - userLocation.lat, b.longitude - userLocation.lng);
+      return distA - distB;
+    });
+  }
 
-  // Track scrolling and load more photos if we're at the bottom
-  const handleScroll = () => {
-    const container = photosContainerRef.current;
-    if (container.scrollHeight - container.scrollTop === container.clientHeight && hasMore && !loading) {
-      fetchMinyans(); // We're at the bottom, load more photos
+  setMinyans(sorted);
+}, [sortBy, userLocation, originalMinyans]);
+
+  // Fetch geolocation
+  useEffect(() => {
+    if (locationMode === "current") {
+      navigator.geolocation.getCurrentPosition(
+        pos => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        err => console.error('Location error:', err)
+      );
+    }
+  }, [locationMode]);
+
+  // Fetch minyans
+  const fetchMinyans = async () => {
+    if (loading || !hasMore) return;
+    setLoading(true);
+
+    try {
+      const url = new URL("http://localhost:3001/minyans");
+      url.searchParams.set("start", start.current);
+      url.searchParams.set("_limit", limit);
+      if (desiredTime) {
+        url.searchParams.set("time_from", desiredTime);
+      }
+
+      url.searchParams.set("sort_by", "time");
+    
+const res = await fetch(url);
+const json = await res.json();
+
+const combined = [...originalMinyans, ...json];
+setOriginalMinyans(combined); // שמירה של כל המניינים
+
+// סינון ומיון בצד הלקוח:
+// const sorted = sortMinyans(combined, sortBy, userLocation);
+// setMinyans(sorted);
+
+start.current += limit;
+if (json.length < limit) setHasMore(false);
+if (json.length === 0 && start.current === limit) setMessage('לא נמצאו מניינים');
+    } catch (err) {
+      console.error('Fetch error:', err);
+      setMessage('שגיאה בטעינת מניינים');
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Fetch initial photos when albumNum changes
-  useEffect(() => {
-    setMinyans([]);  // Reset photos when the album changes
-    start.current = 0;  // Reset start position for fetching
-    setHasMore(true);  // Allow loading more photos
-    fetchMinyans();  // Fetch photos based on albumNum
-  },[]);
+  // Convert address to coordinates
+  const fetchCoordsFromAddress = async (address) => {
+    try {
+      const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=AIzaSyCVdsExOdchWIspVTLcCOgScugWBmgBllw`);
+      const data = await res.json();
+      if (data.status === "OK") {
+        const location = data.results[0].geometry.location;
+        setUserLocation({ lat: location.lat, lng: location.lng });
+        return true;
+      } else {
+        setMessage("כתובת לא תקינה");
+        return false;
+      }
+    } catch (err) {
+      console.error("Geocode error", err);
+      setMessage("שגיאה באימות כתובת");
+      return false;
+    }
+  };
 
-  // Listen for scroll events to trigger fetching more photos
+  // Scroll handler
   useEffect(() => {
-    const container = minyansSetRef.current;
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const nearBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 100;
+      if (nearBottom) fetchMinyans();
+    };
+
     container.addEventListener('scroll', handleScroll);
     return () => container.removeEventListener('scroll', handleScroll);
   }, [loading, hasMore]);
 
-  // Open modal when photo is clicked
-  const handleMinyanClick = (photo) => {
-    setSelectedMinyan(photo);
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(''), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
+  const getNowDateTimeLocal = () => {
+    const now = new Date();
+    now.setSeconds(0, 0);
+    return now.toISOString().slice(0, 16);
   };
 
-  // Close modal
-  const handleClose = () => {
-    setSelectedMinyan(null);
+  const handleSearch = async () => {
+    setMinyans([]);
+    setHasMore(true);
+    start.current = 0;
+
+    if (locationMode === "manual") {
+      const ok = await fetchCoordsFromAddress(manualAddress);
+      if (!ok) return;
+    }
+
+    fetchMinyans();
   };
 
-  // Fields for AddNew component
-  // const photoFields = [
-  //   { name: 'title', label: 'Title' },
-  //   { name: 'url', label: 'URL' },
-  //   { name: 'thumbnailUrl', label: 'Thumbnail URL' },
-  // ];
-
-  // Render the photos and the modal
   return (
-    <>
-      {/* <Link to={`/users/${userId}/posts/`} className="close-link">X</Link> */}
+    <div>
+      <h2 style={{ textAlign: 'center' }}>מניינים קיימים</h2>
 
-      <div>
-        {/* <h3>Album No {albumNum}</h3> */}
+      {/* Time filter */}
+      <div style={{ textAlign: 'center', margin: '1em' }}>
+        <label>מניין לזמן מסוים:&nbsp;</label>
+        <input
+          type="datetime-local"
+          value={desiredTime}
+          min={getNowDateTimeLocal()}
+          onChange={(e) => {
+            setMinyans([]);
+            setHasMore(true);
+            start.current = 0;
+            setDesiredTime(e.target.value);
+          }}
+          style={{ padding: '0.3em' }}
+        />
+      </div>
+<SortOptions sortBy={sortBy} setSortBy={setSortBy} />
 
-        {/* AddNew component for adding new photos */}
-{/* {        <AddNew
-          setItemArray={setPhotos}  // Ensure setItemArray updates the photos state correctly
-          allItemArray={photos}
-          apiEndpoint="/photos"
-          itemFields={photoFields}
-          itemType="Photo"
-          setFiltered={setPhotos}  // Make sure this doesn't overwrite the photos list unexpectedly
-        />} */}
-
-        {/* Container for the photos */}
-        <div 
-          ref={minyansSetRef} 
-          className="minyans-container" 
-          style={{ overflowY: 'scroll', height: '80vh' }}
-        >
-          {minyans.map((minyan, index) => (
-            <Photo_Single
-              key={index}
-              minyan={minyan}
-              minyans={minyans}
-              onClick={() => handleMinyanClick(photo)}  // Open modal on photo click
-              setMinyans={setMinyans}  // This can be removed or refactored if it's unnecessary
+      {/* Location selection */}
+      <div style={{ textAlign: 'center', margin: '1em' }}>
+        <label>
+          <input
+            type="radio"
+            name="locationMode"
+            value="current"
+            checked={locationMode === "current"}
+            onChange={() => setLocationMode("current")}
+          />
+          &nbsp;המיקום הנוכחי שלי
+        </label>
+        &nbsp;&nbsp;
+        <label>
+          <input
+            type="radio"
+            name="locationMode"
+            value="manual"
+            checked={locationMode === "manual"}
+            onChange={() => setLocationMode("manual")}
+          />
+          &nbsp;כתובת אחרת
+        </label>
+        {locationMode === "manual" && (
+          <div style={{ marginTop: '0.5em' }}>
+            <input
+              type="text"
+              placeholder="לדוגמה: הרצל 10, תל אביב"
+              value={manualAddress}
+              onChange={(e) => setManualAddress(e.target.value)}
+              style={{ padding: '0.3em', width: '60%' }}
             />
-          ))}
-          {loading && <div>Loading...</div>} {/* Loading indicator */}
+          </div>
+        )}
+        <div style={{ marginTop: '1em' }}>
+          <button onClick={handleSearch}>🔍 חפש</button>
         </div>
       </div>
 
-      {/* Modal component for showing the selected photo */}
-      {selectedMinyan && (
-        <Modal selectedMinyan={selectedMinyan} handleClose={handleClose} />
-      )}
-    </>
+      {/* Message */}
+      {message && <div style={{ color: 'red', textAlign: 'center' }}>{message}</div>}
+
+      {/* Minyan list */}
+      <div
+        ref={containerRef}
+        className="minyans-container"
+        style={{
+          overflowY: 'scroll',
+          height: '80vh',
+          border: '1px solid #ccc',
+          padding: '1em',
+        }}
+      >
+        {minyans.length === 0 && !loading && !message && <p>לא נמצאו מניינים</p>}
+
+      {minyans.map((minyan, index) => (
+  <Minyan
+    key={index}
+    minyan={minyan}
+    userLocation={userLocation}
+    departureTime={desiredTime || new Date().toISOString()} // נ fallback לזמן נוכחי
+  />
+))}
+
+
+        {loading && <div>טוען מניינים...</div>}
+        {!hasMore && <div style={{ textAlign: 'center', marginTop: '1em' }}>אין עוד מניינים</div>}
+      </div>
+    </div>
   );
 }
 
