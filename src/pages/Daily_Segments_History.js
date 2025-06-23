@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import Photo_Single from '../components/Photo_Single';
-import AddNew from '../components/AddNew';
-import Modal from '../components/Modal';
+
 
 function Daily_Segment_History() {
   // const { albumNum, userId } = useParams();
