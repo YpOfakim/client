@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { useContext } from 'react';
-import { AuthContext } from '../App'; // ודאי שהנתיב נכון
+import { AuthContext } from '../App'; 
 import '../style/nav_style.css'; 
 
 const Navigation = ({ userId }) => {
