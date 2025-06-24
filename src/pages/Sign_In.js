@@ -1,65 +1,224 @@
-import { useState,useEffect } from 'react'
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Link } from 'react-router-dom';
-import React from 'react';
-function Login() {
-  const [msg, setMsg] = useState();
-  const [currentUserName, setCurrentUserName] = useState("");
-  const [currentPassWord, setCurrentPassWord] = useState("");
-  const [userArray, setUserArray] = useState([]);
-  
+
+
+ function Login() {
+  localStorage.removeItem("authToken");
+  localStorage.removeItem("userInfo");
+  localStorage.removeItem("currentSpe");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // מצב להצגת הסיסמה
+  const [error, setError] = useState(""); // משתנה לאחסון הודעות שגיאה
   const navigate = useNavigate();
-  useEffect(() => {
-    fetch('http://localhost:3001/users')
-      .then((response) => response.json())
-      .then((json) => setUserArray(json))
-      .catch((err) => console.error(err)); // טיפול בשגיאות
-  }, []);
 
-   // פונקציה לכניסת משתמש קיים
-   const handleSubmit = (e) => {
-    e.preventDefault();
-console.log(userArray);
-    const userFound = userArray.find(u => u.username === currentUserName);
-    console.log(userFound);
-    if (userFound) {
-     
-      if (userFound.password === currentPassWord) {
-        // עדכון localStorage
+  const handleLogin = async () => {
+    try {
+        const token = localStorage.getItem("authToken");
+let fullpath = "http://localhost:3001/auth/login";
+  console.log("fetchLogin", fullpath);
 
-        localStorage.setItem('userFound', JSON.stringify(userFound));
-      
-
-        navigate(`/users/${userFound.id}/home`);
-        }
-        else{
-          setMsg("password is incorrect");
-          setTimeout(() => setMsg(''), 4000);
-        }
-      } else {
-      setMsg("user doesn't exist");
-      setTimeout(() => setMsg(''), 4000);
+return fetch(fullpath, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ userName: username, password: password }),
+}).then(async (response) => {
+  const text = await response.text();
+  try {
+    const data = JSON.parse(text);
+    if (response.ok) {
+      return data;
+    } else {
+      throw new Error(data.message || "Login failed");
     }
-    // ריקון השדות לאחר שליחת הטופס
-    setCurrentUserName("");
-    setCurrentPassWord("");
+  } catch {
+    throw new Error(text);
+  }
+});
+
+      // const response = await LoginFetch(username, password);
+      // console.log("response", response);
+      // console.log("response.token", response.token);
+      // if (response.token) {
+      //   localStorage.setItem("authToken", response.token); // שמירת ה-token ב-localStorage
+      //   const emp = await Read(`/employees/?id=${username}&login=true`);
+      //   const empObj = emp[0];
+      //   console.log("empObj", empObj);
+      //   localStorage.setItem(
+      //     "userInfo",
+      //     JSON.stringify({
+      //       EmpId: empObj.EmpId,
+      //       FirstName: empObj.FirstName,
+      //       LastName: empObj.LastName,
+      //       Role: empObj.Role,
+      //     })
+      //   );
+      //   navigate("hello", { state: { emp: emp[0] } });
+      // } else {
+      //   setError("Failed to log in");
+      // }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.error ||
+        error.message ||
+        "An unexpected error occurred";
+      alert(errorMessage);
+      console.error("Error during login:", error);
+      console.log(error.response);
+      console.log("error", error);
+      console.log(error.response?.data);
+      setError(error.response?.data?.error || "An unexpected error occurred"); // שמירת הודעת השגיאה
+      setUsername(""); // איפוס שדות הקלט
+      setPassword(""); // איפוס שדות הקלט
+    }
   };
+
+  const handleInputChange = (setter) => (e) => {
+    setter(e.target.value);
+    setError(""); // הסתרת הודעת השגיאה בעת הזנת נתונים חדשים
+  };
+
+  const toggleShowPassword = () => {
+    setShowPassword((prevState) => !prevState);
+  };
+
   return (
-    <>
-          <h3> LogIn:</h3>
-      <form id="userLogin">
-        <input type="text" placeholder="userName" id="userNameLogin" value={currentUserName}
-          onChange={(e) => setCurrentUserName(e.target.value)} />
-        <input type="text" placeholder="password" id="userNamePassword" value={currentPassWord}
-          onChange={(e) => setCurrentPassWord(e.target.value)}
+    <div className="login">
+      <h1> Login </h1>
+      {error && <p className="error-message">{error}</p>}
+      <input
+        type="text"
+        placeholder="Username"
+        value={username}
+        onChange={handleInputChange(setUsername)}
+      />
+
+      <div className="password-container">
+        <input
+          type={showPassword ? "text" : "password"}
+          placeholder="Password"
+          value={password}
+          onChange={handleInputChange(setPassword)}
         />
-        <button onClick={handleSubmit}>submit</button>
-        <div>{msg}</div>
-      </form>
-      <h3>New? </h3>
-      <Link to="register"> <button> Register</button> </Link>
-    </>
+        <button
+          type="button"
+          className="toggle-password"
+          onClick={toggleShowPassword}
+        >
+          {showPassword ? "🙈" : "👁️"} {/* אייקון עין */}
+        </button>
+      </div>
+
+      <button onClick={handleLogin}>Login</button>
+    </div>
   );
 }
+
+// import { useEffect, useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { Read } from "../fetch";
+
+// export default function Login() {
+//   const [username, setUsername] = useState("");
+//   const [password, setPassword] = useState("");
+//   const navigate = useNavigate();
+//   const handleLogin = () => {
+//     /////האם צריך להיות בתוך useEffect?
+
+//     Read(`/employees/?id=${password}`).then((res) => {
+//       if (res.length === 1) {
+//         // if (res.length) {
+//         // } else {
+//         console.log(res.status);
+//         console.log(res);
+//         console.log(res[0].FirstName);
+//         ///האם היא רכזת?
+//         useEffect(() => {
+//           Read(`/speces/?empId=${res[0].EmpId}`).await((speRes) => {
+//             console.log(speRes);
+//             if (speRes.length !== 0) {
+//               console.log(speRes[0].EmpId);
+//               navigate("home", { coordinator: speRes[0].EmpId }); //שליחת מגמה
+//               setPassword("");
+//             } else {
+//               navigate("teacher", { state: res[0] }); //שליחת עובד
+//               setPassword("");
+//             }
+//           });
+//         }[]);
+
+//         // }
+//       } else {
+//         alert("User whith this id does not exist");
+//         setPassword("");
+//       }
+//     });
+//   };
+//   return (
+//     <div className="Login">
+//       <h1> Login </h1>
+
+//       <input
+//         type="text"
+//         placeholder="Username"
+//         value={username}
+//         onChange={(e) => setUsername(e.target.value)}
+//       />
+//       <input
+//         type="text"
+//         placeholder="Password"
+//         value={password}
+//         onChange={(e) => setPassword(e.target.value)}
+//       />
+
+//       <button onClick={handleLogin}>Login</button>
+//     </div>
+//   );
+// }
+
+// const handleLogin = async () => {
+//   try {
+//     const existEmp = await Read(`/employees/?id=${password}&login=true`);
+//     if (existEmp.length === 1) {
+//       // console.log(res);
+//       // console.log(res[0].FirstName);
+//       // const speRes = await Read(`/speces/?empId=${res[0].EmpId}`);
+//       // console.log(speRes);
+//       // if (speRes.length !== 0) {
+//       console.log(existEmp[0]);
+//       // navigate("home", { state: { spe: speRes[0] } }); //שליחת מגמה
+//       navigate("hello", { state: { emp: existEmp[0] } }); //שליחת מגמה
+
+//       // } else {
+//       // navigate("teacher", { state: { emp: existEmp[0] } }); //שליחת עובד
+//       // }
+//       setPassword("");
+//     } else {
+//       alert("User with this ID does not exist");
+//       setPassword("");
+//     }
+//   } catch (error) {
+//     console.error("Error during login:", error);
+//   }
+// };
+
+// return (
+//   <div className="Login">
+//     <h1> Login </h1>
+//     <input
+//       type="text"
+//       placeholder="Username"
+//       value={username}
+//       onChange={(e) => setUsername(e.target.value)}
+//     />
+//     <input
+//       type="password" // תיקון טקסט הקלט לסיסמה
+//       placeholder="Password"
+//       value={password}
+//       onChange={(e) => setPassword(e.target.value)}
+//     />
+//     <button onClick={handleLogin}>Login</button>
+//   </div>
+// );
 
 export default Login;
