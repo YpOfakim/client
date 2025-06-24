@@ -5,38 +5,39 @@ import SortOptions from '../components/SortOptions';
 
 function Search_Minyans() {
   const [minyans, setMinyans] = useState([]);
+  const [originalMinyans, setOriginalMinyans] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
-  const [locationMode, setLocationMode] = useState("current"); // current | manual
+  const [locationMode, setLocationMode] = useState("current");
   const [manualAddress, setManualAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [message, setMessage] = useState('');
-  const [desiredTime, setDesiredTime] = useState('');
-const [sortBy, setSortBy] = useState('time'); // 'time' או 'distance'
-const [originalMinyans, setOriginalMinyans] = useState([]);
+  const [desiredTime, setDesiredTime] = useState(null);
+  const [sortBy, setSortBy] = useState('time');
 
   const limit = 4;
   const start = useRef(0);
   const containerRef = useRef(null);
-useEffect(() => {
-  if (!originalMinyans.length) return;
 
-  let sorted = [...originalMinyans];
+  // מיון בצד לקוח
+  useEffect(() => {
+    if (!originalMinyans.length) return;
 
-  if (sortBy === 'time') {
-    sorted.sort((a, b) => new Date(a.time_and_date) - new Date(b.time_and_date));
-  } else if (sortBy === 'distance' && userLocation) {
-    sorted.sort((a, b) => {
-      const distA = Math.hypot(a.latitude - userLocation.lat, a.longitude - userLocation.lng);
-      const distB = Math.hypot(b.latitude - userLocation.lat, b.longitude - userLocation.lng);
-      return distA - distB;
-    });
-  }
+    let sorted = [...originalMinyans];
+    if (sortBy === 'time') {
+      sorted.sort((a, b) => new Date(a.time_and_date) - new Date(b.time_and_date));
+    } else if (sortBy === 'distance' && userLocation) {
+      sorted.sort((a, b) => {
+        const distA = Math.hypot(a.latitude - userLocation.lat, a.longitude - userLocation.lng);
+        const distB = Math.hypot(b.latitude - userLocation.lat, b.longitude - userLocation.lng);
+        return distA - distB;
+      });
+    }
 
-  setMinyans(sorted);
-}, [sortBy, userLocation, originalMinyans]);
+    setMinyans(sorted);
+  }, [sortBy, userLocation, originalMinyans]);
 
-  // Fetch geolocation
+  // קבלת מיקום נוכחי
   useEffect(() => {
     if (locationMode === "current") {
       navigator.geolocation.getCurrentPosition(
@@ -46,46 +47,25 @@ useEffect(() => {
     }
   }, [locationMode]);
 
-  // Fetch minyans
-  const fetchMinyans = async () => {
-    if (loading || !hasMore) return;
-    setLoading(true);
+  // חיפוש כללי
+  const handleSearch = async () => {
+    setMinyans([]);
+    setOriginalMinyans([]);
+    setHasMore(true);
+    start.current = 0;
 
-    try {
-      const url = new URL("http://localhost:3001/minyans");
-      url.searchParams.set("start", start.current);
-      url.searchParams.set("_limit", limit);
-      if (desiredTime) {
-        url.searchParams.set("time_from", desiredTime);
-      }
-
-      url.searchParams.set("sort_by", "time");
-    
-const res = await fetch(url);
-const json = await res.json();
-
-const combined = [...originalMinyans, ...json];
-setOriginalMinyans(combined); // שמירה של כל המניינים
-
-// סינון ומיון בצד הלקוח:
-// const sorted = sortMinyans(combined, sortBy, userLocation);
-// setMinyans(sorted);
-
-start.current += limit;
-if (json.length < limit) setHasMore(false);
-if (json.length === 0 && start.current === limit) setMessage('לא נמצאו מניינים');
-    } catch (err) {
-      console.error('Fetch error:', err);
-      setMessage('שגיאה בטעינת מניינים');
-    } finally {
-      setLoading(false);
+    if (locationMode === "manual") {
+      const ok = await fetchCoordsFromAddress(manualAddress);
+      if (!ok) return;
     }
+
+    await fetchMinyans();
   };
 
-  // Convert address to coordinates
+  // המרת כתובת לקורדינטות
   const fetchCoordsFromAddress = async (address) => {
     try {
-      const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=AIzaSyCVdsExOdchWIspVTLcCOgScugWBmgBllw`);
+      const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=YOUR_API_KEY`);
       const data = await res.json();
       if (data.status === "OK") {
         const location = data.results[0].geometry.location;
@@ -96,13 +76,48 @@ if (json.length === 0 && start.current === limit) setMessage('לא נמצאו מ
         return false;
       }
     } catch (err) {
-      console.error("Geocode error", err);
       setMessage("שגיאה באימות כתובת");
       return false;
     }
   };
 
-  // Scroll handler
+  // שליפת מניינים מהשרת
+  const fetchMinyans = async () => {
+    if (loading || !hasMore) return;
+    setLoading(true);
+
+    try {
+      const url = new URL("http://localhost:3001/minyans");
+      url.searchParams.set("start", start.current);
+      url.searchParams.set("_limit", limit);
+
+      const timeToUse = desiredTime && !isNaN(new Date(desiredTime)) ? new Date(desiredTime) : new Date();
+      url.searchParams.set("time_from", timeToUse.toISOString());
+
+      const res = await fetch(url);
+      const json = await res.json();
+
+      if (json.length === 0 && start.current === 0) {
+        setMessage("לא נמצאו מניינים");
+      }
+
+      const newCombined = [...originalMinyans, ...json];
+      setOriginalMinyans(newCombined);
+      start.current += limit;
+
+      if (json.length < limit) {
+        setHasMore(false);
+      }
+
+    } catch (err) {
+      console.error('Fetch error:', err);
+      setMessage("שגיאה בטעינת מניינים");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // אינפיניט סקרול
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -116,6 +131,7 @@ if (json.length === 0 && start.current === limit) setMessage('לא נמצאו מ
     return () => container.removeEventListener('scroll', handleScroll);
   }, [loading, hasMore]);
 
+  // נקה הודעה לאחר כמה שניות
   useEffect(() => {
     if (message) {
       const timer = setTimeout(() => setMessage(''), 3000);
@@ -123,48 +139,35 @@ if (json.length === 0 && start.current === limit) setMessage('לא נמצאו מ
     }
   }, [message]);
 
+  // תאריך נוכחי בפורמט ל־datetime-local
   const getNowDateTimeLocal = () => {
     const now = new Date();
     now.setSeconds(0, 0);
     return now.toISOString().slice(0, 16);
   };
 
-  const handleSearch = async () => {
-    setMinyans([]);
-    setHasMore(true);
-    start.current = 0;
-
-    if (locationMode === "manual") {
-      const ok = await fetchCoordsFromAddress(manualAddress);
-      if (!ok) return;
-    }
-
-    fetchMinyans();
-  };
-
   return (
     <div>
       <h2 style={{ textAlign: 'center' }}>מניינים קיימים</h2>
 
-      {/* Time filter */}
+      {/* סינון לפי זמן */}
       <div style={{ textAlign: 'center', margin: '1em' }}>
         <label>מניין לזמן מסוים:&nbsp;</label>
         <input
           type="datetime-local"
-          value={desiredTime}
+          value={desiredTime || ''}
           min={getNowDateTimeLocal()}
           onChange={(e) => {
-            setMinyans([]);
-            setHasMore(true);
-            start.current = 0;
             setDesiredTime(e.target.value);
           }}
           style={{ padding: '0.3em' }}
         />
       </div>
-<SortOptions sortBy={sortBy} setSortBy={setSortBy} />
 
-      {/* Location selection */}
+      {/* סינון לפי מרחק / זמן */}
+      <SortOptions sortBy={sortBy} setSortBy={setSortBy} />
+
+      {/* מיקום נוכחי או ידני */}
       <div style={{ textAlign: 'center', margin: '1em' }}>
         <label>
           <input
@@ -203,10 +206,10 @@ if (json.length === 0 && start.current === limit) setMessage('לא נמצאו מ
         </div>
       </div>
 
-      {/* Message */}
+      {/* הודעות */}
       {message && <div style={{ color: 'red', textAlign: 'center' }}>{message}</div>}
 
-      {/* Minyan list */}
+      {/* רשימת מניינים */}
       <div
         ref={containerRef}
         className="minyans-container"
@@ -219,15 +222,14 @@ if (json.length === 0 && start.current === limit) setMessage('לא נמצאו מ
       >
         {minyans.length === 0 && !loading && !message && <p>לא נמצאו מניינים</p>}
 
-      {minyans.map((minyan, index) => (
-  <Minyan
-    key={index}
-    minyan={minyan}
-    userLocation={userLocation}
-    departureTime={desiredTime || new Date().toISOString()} // נ fallback לזמן נוכחי
-  />
-))}
-
+        {minyans.map((minyan, index) => (
+          <Minyan
+            key={index}
+            minyan={minyan}
+            userLocation={userLocation}
+            departureTime={desiredTime || new Date().toISOString()}
+          />
+        ))}
 
         {loading && <div>טוען מניינים...</div>}
         {!hasMore && <div style={{ textAlign: 'center', marginTop: '1em' }}>אין עוד מניינים</div>}
