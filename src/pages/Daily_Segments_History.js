@@ -1,123 +1,57 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import Daily_Segment from '../components/Daily_Segment'; 
 
+function Daily_Segments_History() {
+  const [segments, setSegments] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
 
-// function Daily_Segment_History() {
-//   // const { albumNum, userId } = useParams();
-//   const [minyans, setMinyans] = useState([]);
-//   const [selectedMinyan, setSelectedMinyan] = useState(null);
-//   const [loading, setLoading] = useState(false);
-//   const [hasMore, setHasMore] = useState(true);  // אם יש עוד תמונות להוריד
-//   const limit = 4; // מספר התמונות שנביא בכל פעם
-//   const start = useRef(0);  // משתנה שמכיל את המיקום שבו הפסקנו בטעינה האחרונה
-//   const minyansSetRef = useRef(null);
+  useEffect(() => {
+    // שליפת כל החיזוקים (בהנחה שהשרת מחזיר רשימה של אובייקטים עם תאריך ונתיב PDF)
+    fetch('/api/daily_segments') // החליפי לכתובת האמיתית שלך
+      .then(res => res.json())
+      .then(data => {
+        // מיון מהתאריך החדש לישן
+        const sorted = data.sort((a, b) => new Date(b.segment_date) - new Date(a.segment_date));
+        setSegments(sorted);
 
-//   // Function to fetch photos from server
-//   const fetchMinyans = () => {
-//     if (loading || !hasMore) return;  // If we're already loading or there's no more photos, don't fetch
+        // ברירת מחדל: תאריך של היום
+        const today = new Date().toISOString().slice(0, 10);
+        const todayExists = sorted.find(s => s.segment_date === today);
+        setSelectedDate(todayExists ? today : sorted[0]?.segment_date);
+      });
+  }, []);
 
-//     setLoading(true);  // Start loading
-//     fetch(`http://localhost:3001/minyans?start=${start.current}&_limit=${limit}`)
-//       .then((response) => response.json())
-//       .then((json) => {
-//         setMinyans((prevMinyans) => [...prevMinyans, ...json]); // Add new photos to the list
-//         start.current += limit; // Update the start index
-//         setLoading(false);
+  return (
+    <div style={{ display: 'flex', direction: 'rtl', height: '100%' }}>
+      {/* רשימת תאריכים - צד ימין */}
+      <div style={{ width: '30%', overflowY: 'auto', borderLeft: '1px solid lightgray', padding: '1rem' }}>
+        <h3>היסטוריית חיזוקים</h3>
+        {segments.map(segment => (
+          <div
+            key={segment.segment_date}
+            onClick={() => setSelectedDate(segment.segment_date)}
+            style={{
+              padding: '0.5rem',
+              marginBottom: '0.5rem',
+              cursor: 'pointer',
+              backgroundColor: selectedDate === segment.segment_date ? '#d1e7dd' : 'transparent',
+              borderRadius: '8px',
+              textAlign: 'center'
+            }}
+          >
+            {new Date(segment.segment_date).toLocaleDateString('he-IL')}
+          </div>
+        ))}
+      </div>
 
-//         // If the fetched photos are less than the limit, then there are no more photos to load
-//         if (json.length < limit) {
-//           setHasMore(false);
-//         }
-//       })
-//       .catch((err) => {
-//         console.error(err);
-//         setLoading(false);
-//       });
-//   };
+      {/* תצוגת חיזוק יומי - צד שמאל */}
+      <div style={{ flex: 1, padding: '1rem' }}>
+        {selectedDate && (
+          <Daily_Segment selectedDate={selectedDate} />
+        )}
+      </div>
+    </div>
+  );
+}
 
-//   // Track scrolling and load more photos if we're at the bottom
-//   const handleScroll = () => {
-//     const container = photosContainerRef.current;
-//     if (container.scrollHeight - container.scrollTop === container.clientHeight && hasMore && !loading) {
-//       fetchMinyans(); // We're at the bottom, load more photos
-//     }
-//   };
-
-//   // Fetch initial photos when albumNum changes
-//   useEffect(() => {
-//     setMinyans([]);  // Reset photos when the album changes
-//     start.current = 0;  // Reset start position for fetching
-//     setHasMore(true);  // Allow loading more photos
-//     fetchMinyans();  // Fetch photos based on albumNum
-//   },[]);
-
-//   // Listen for scroll events to trigger fetching more photos
-//   useEffect(() => {
-//     const container = minyansSetRef.current;
-//     container.addEventListener('scroll', handleScroll);
-//     return () => container.removeEventListener('scroll', handleScroll);
-//   }, [loading, hasMore]);
-
-//   // Open modal when photo is clicked
-//   const handleMinyanClick = (photo) => {
-//     setSelectedMinyan(photo);
-//   };
-
-//   // Close modal
-//   const handleClose = () => {
-//     setSelectedMinyan(null);
-//   };
-
-//   // Fields for AddNew component
-//   // const photoFields = [
-//   //   { name: 'title', label: 'Title' },
-//   //   { name: 'url', label: 'URL' },
-//   //   { name: 'thumbnailUrl', label: 'Thumbnail URL' },
-//   // ];
-
-//   // Render the photos and the modal
-//   return (
-//     <>
-//       {/* <Link to={`/users/${userId}/posts/`} className="close-link">X</Link> */}
-
-//       <div>
-//         <h3>Album No {albumNum}</h3>
-
-//         {/* AddNew component for adding new photos */}
-// {/* {        <AddNew
-//           setItemArray={setPhotos}  // Ensure setItemArray updates the photos state correctly
-//           allItemArray={photos}
-//           apiEndpoint="/photos"
-//           itemFields={photoFields}
-//           itemType="Photo"
-//           setFiltered={setPhotos}  // Make sure this doesn't overwrite the photos list unexpectedly
-//         />} */}
-
-//         {/* Container for the photos */}
-//         <div 
-//           ref={minyansSetRef} 
-//           className="minyans-container" 
-//           style={{ overflowY: 'scroll', height: '80vh' }}
-//         >
-//           {minyans.map((minyan, index) => (
-//             <Photo_Single
-//               key={index}
-//               minyan={minyan}
-//               minyans={minyans}
-//               onClick={() => handleMinyanClick(photo)}  // Open modal on photo click
-//               setMinyans={setMinyans}  // This can be removed or refactored if it's unnecessary
-//             />
-//           ))}
-//           {loading && <div>Loading...</div>} {/* Loading indicator */}
-//         </div>
-//       </div>
-
-//       {/* Modal component for showing the selected photo */}
-//       {selectedMinyan && (
-//         <Modal selectedMinyan={selectedMinyan} handleClose={handleClose} />
-//       )}
-//     </>
-//   );
-// }
-
-// export default Daily_Segment_History;
+export default Daily_Segments_History;
