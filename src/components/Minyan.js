@@ -66,7 +66,9 @@ function Minyan({ minyan, userLocation, departureTime }) {
       })
       .catch(() => setError('שגיאה בחישוב נסיעה'));
   }, [userLocation, departureTime]);
+  const handleAddToMinyan = (e) => {
 
+  };
 
   const fullyMissed = missesWalk && missesDrive;
 
@@ -96,7 +98,7 @@ function Minyan({ minyan, userLocation, departureTime }) {
           🚗 נסיעה: {driveInfo.duration} ({driveInfo.distance})
         </p>
       )}
-
+        <button onClick={handleAddToMinyan}>הצטרף למניין</button>
       {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
   );
