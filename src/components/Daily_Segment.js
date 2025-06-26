@@ -4,29 +4,39 @@ function Daily_Segment({ selectedDate }) {
   const [imageUrl, setImageUrl] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchDailyImage() {
-      try {
-        setLoading(true);
+useEffect(() => {
+  async function fetchDailyImage() {
+    try {
+      setLoading(true);
+      console.log("🔍 שולח בקשה לתאריך:", selectedDate);
+      console.log(selectedDate);
 
-        const res = await fetch(`http://localhost:3001/daily/daily-page?date=${selectedDate}`);
-        if (!res.ok) throw new Error("שגיאה בטעינת הדף לתאריך זה");
-        
-        const blob = await res.blob();
-        const url = URL.createObjectURL(blob);
-        setImageUrl(url);
-      } catch (err) {
-        console.error("שגיאה:", err);
-        setImageUrl(null);
-      } finally {
-        setLoading(false);
+      const res = await fetch(`http://localhost:3001/daily/daily-page?date=${selectedDate}`);
+
+      if (!res.ok) {
+        throw new Error(`שגיאה בטעינת הדף. קוד סטטוס: ${res.status}`);
       }
-    }
 
-    if (selectedDate) {
-      fetchDailyImage();
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("image")) {
+        throw new Error("התגובה אינה תמונה");
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      setImageUrl(url);
+    } catch (err) {
+      console.error("❌ שגיאה:", err.message);
+      setImageUrl(null);
+    } finally {
+      setLoading(false);
     }
-  }, [selectedDate]);
+  }
+
+  if (selectedDate) {
+    fetchDailyImage();
+  }
+}, [selectedDate]);
 
   return (
     <div style={{ flex: 1, textAlign: "center" }}>
