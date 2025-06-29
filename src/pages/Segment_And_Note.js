@@ -1,43 +1,63 @@
-// components/Segment_And_Note.jsx
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import Daily_Segment from '../components/Daily_Segment'; 
 import '../style/Style_segment_note.css';
 
 function Segment_And_Note() {
+  const { userId } = useParams();  // קבלת ה-userId מה-URL
   const [note, setNote] = useState("");
+  const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(true);
+  const [today, setToday] = useState("");
 
-  useEffect(() => {
-    const today = new Date().toISOString().split("T")[0];
-    const savedNote = localStorage.getItem(`note_${today}`);
-    setNote(savedNote || "");
-    setLoading(false);
-  }, []);
 
-  const handleSaveNote = () => {
-    const today = new Date().toISOString().split("T")[0];
-    localStorage.setItem(`note_${today}`, note);
-    alert("ההערה נשמרה!");
+
+  const handleSaveNote = async () => {
+    try {
+      const res = await fetch(`http://localhost:3001/notes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          date: today,
+          note: note,
+          title: title,
+          userId: userId
+        })
+      });
+
+      if (!res.ok) throw new Error("שגיאה בשמירת ההערה");
+      alert("ההערה נשמרה!");
+    } catch (err) {
+      alert("אירעה שגיאה בשמירה");
+      console.error(err);
+    }
   };
 
-return (
-  <div className="segment-container">
-    <div className="segment-image">
-      {/* תמונת החיזוק היומי מהקומפוננטה Daily_Segment */}
-      <Daily_Segment />
-    </div>
+  if (loading) return <p>טוען...</p>;
 
-    <div className="segment-note">
-      <h3>הערה אישית</h3>
-      <textarea
-        value={note}
-        onChange={(e) => setNote(e.target.value)}
-        placeholder="כתוב/כתבי כאן חיזוק אישי ליום..."
-      />
-      <button onClick={handleSaveNote}>שמור</button>
+  return (
+    <div className="segment-container">
+      <div className="segment-image">
+        <Daily_Segment selectedDate={today} />
+      </div>
+
+      <div className="segment-note">
+        <h3>הערה אישית</h3>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="כותרת ההערה"
+        />
+        <textarea
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder="כתוב/י כאן הערה אישית"
+        />
+        <button onClick={handleSaveNote}>שמור</button>
+      </div>
     </div>
-  </div>
-);
+  );
 }
 
 export default Segment_And_Note;

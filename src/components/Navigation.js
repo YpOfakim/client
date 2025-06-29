@@ -22,7 +22,7 @@ const Navigation = ({ userId }) => {
         <div className="dropdown-content">
           <NavLink to={`/user/${userId}/sidur/Shacharit`}>שחרית</NavLink>
           <NavLink to={`/user/${userId}/sidur/Mincha`}>מנחה</NavLink>
-          <NavLink to={`/user/${userId}/sidur/Maariv`}>מעריב</NavLink>
+          <NavLink to={`/user/${userId}/sidur/Maariv`}>ערבית</NavLink>
         </div>
       </div>
 

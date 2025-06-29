@@ -1,123 +1,80 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import Daily_Segment from '../components/Daily_Segment';
 
+function Daily_Segments_History() {
+  const [segments, setSegments] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-// function Daily_Segment_History() {
-//   // const { albumNum, userId } = useParams();
-//   const [minyans, setMinyans] = useState([]);
-//   const [selectedMinyan, setSelectedMinyan] = useState(null);
-//   const [loading, setLoading] = useState(false);
-//   const [hasMore, setHasMore] = useState(true);  // אם יש עוד תמונות להוריד
-//   const limit = 4; // מספר התמונות שנביא בכל פעם
-//   const start = useRef(0);  // משתנה שמכיל את המיקום שבו הפסקנו בטעינה האחרונה
-//   const minyansSetRef = useRef(null);
+  function getLocalDateOnly(dateStr = '') {
+    if (!dateStr) return '';
+    const [datePart] = dateStr.split(',');
+    const [day, month, year] = datePart.trim().split('.');
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  }
+  
+  useEffect(() => {
+    fetch('http://localhost:3001/daily_segments/all-daily-pages')
+      .then(res => res.json())
+      .then(data => {
+        const uniqueByDate = {};
+        data.forEach(s => {
+          const dateOnly = getLocalDateOnly(s.segment_date);
+          if (!uniqueByDate[dateOnly]) {
+            uniqueByDate[dateOnly] = { ...s, dateOnly };
+          }
+        });
 
-//   // Function to fetch photos from server
-//   const fetchMinyans = () => {
-//     if (loading || !hasMore) return;  // If we're already loading or there's no more photos, don't fetch
+        const sorted = Object.values(uniqueByDate).sort((a, b) => new Date(b.dateOnly) - new Date(a.dateOnly));
+        setSegments(sorted);
 
-//     setLoading(true);  // Start loading
-//     fetch(`http://localhost:3001/minyans?start=${start.current}&_limit=${limit}`)
-//       .then((response) => response.json())
-//       .then((json) => {
-//         setMinyans((prevMinyans) => [...prevMinyans, ...json]); // Add new photos to the list
-//         start.current += limit; // Update the start index
-//         setLoading(false);
+        const today = getLocalDateOnly();
+        const todayExists = sorted.find(s => s.dateOnly === today);
+        setSelectedDate(todayExists ? today : sorted[0]?.dateOnly || null);
+      })
+      .catch(err => {
+        console.error("שגיאה בטעינת הנתונים:", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
-//         // If the fetched photos are less than the limit, then there are no more photos to load
-//         if (json.length < limit) {
-//           setHasMore(false);
-//         }
-//       })
-//       .catch((err) => {
-//         console.error(err);
-//         setLoading(false);
-//       });
-//   };
+  return (
+    <div style={{ display: 'flex', direction: 'rtl', height: '100%' }}>
+      <div style={{ width: '30%', overflowY: 'auto', borderLeft: '1px solid lightgray', padding: '1rem' }}>
+        <h3>היסטוריית חיזוקים</h3>
+        {loading ? (
+          <p>טוען חיזוקים...</p>
+        ) : segments.length === 0 ? (
+          <p>לא נמצאו חיזוקים</p>
+        ) : (
+          segments.map(segment => (
+            <div
+              key={segment.dateOnly}
+              onClick={() => setSelectedDate(segment.dateOnly)}
+              style={{
+                padding: '0.5rem',
+                marginBottom: '0.5rem',
+                cursor: 'pointer',
+                backgroundColor: selectedDate === segment.dateOnly ? '#d1e7dd' : 'transparent',
+                borderRadius: '8px',
+                textAlign: 'center'
+              }}
+            >
+              {new Date(segment.dateOnly).toLocaleDateString('he-IL')}
+            </div>
+          ))
+        )}
+      </div>
 
-//   // Track scrolling and load more photos if we're at the bottom
-//   const handleScroll = () => {
-//     const container = photosContainerRef.current;
-//     if (container.scrollHeight - container.scrollTop === container.clientHeight && hasMore && !loading) {
-//       fetchMinyans(); // We're at the bottom, load more photos
-//     }
-//   };
+      <div style={{ flex: 1, padding: '1rem' }}>
+        {selectedDate && (
+          <Daily_Segment selectedDate={selectedDate} />
+        )}
+      </div>
+    </div>
+  );
+}
 
-//   // Fetch initial photos when albumNum changes
-//   useEffect(() => {
-//     setMinyans([]);  // Reset photos when the album changes
-//     start.current = 0;  // Reset start position for fetching
-//     setHasMore(true);  // Allow loading more photos
-//     fetchMinyans();  // Fetch photos based on albumNum
-//   },[]);
-
-//   // Listen for scroll events to trigger fetching more photos
-//   useEffect(() => {
-//     const container = minyansSetRef.current;
-//     container.addEventListener('scroll', handleScroll);
-//     return () => container.removeEventListener('scroll', handleScroll);
-//   }, [loading, hasMore]);
-
-//   // Open modal when photo is clicked
-//   const handleMinyanClick = (photo) => {
-//     setSelectedMinyan(photo);
-//   };
-
-//   // Close modal
-//   const handleClose = () => {
-//     setSelectedMinyan(null);
-//   };
-
-//   // Fields for AddNew component
-//   // const photoFields = [
-//   //   { name: 'title', label: 'Title' },
-//   //   { name: 'url', label: 'URL' },
-//   //   { name: 'thumbnailUrl', label: 'Thumbnail URL' },
-//   // ];
-
-//   // Render the photos and the modal
-//   return (
-//     <>
-//       {/* <Link to={`/users/${userId}/posts/`} className="close-link">X</Link> */}
-
-//       <div>
-//         <h3>Album No {albumNum}</h3>
-
-//         {/* AddNew component for adding new photos */}
-// {/* {        <AddNew
-//           setItemArray={setPhotos}  // Ensure setItemArray updates the photos state correctly
-//           allItemArray={photos}
-//           apiEndpoint="/photos"
-//           itemFields={photoFields}
-//           itemType="Photo"
-//           setFiltered={setPhotos}  // Make sure this doesn't overwrite the photos list unexpectedly
-//         />} */}
-
-//         {/* Container for the photos */}
-//         <div 
-//           ref={minyansSetRef} 
-//           className="minyans-container" 
-//           style={{ overflowY: 'scroll', height: '80vh' }}
-//         >
-//           {minyans.map((minyan, index) => (
-//             <Photo_Single
-//               key={index}
-//               minyan={minyan}
-//               minyans={minyans}
-//               onClick={() => handleMinyanClick(photo)}  // Open modal on photo click
-//               setMinyans={setMinyans}  // This can be removed or refactored if it's unnecessary
-//             />
-//           ))}
-//           {loading && <div>Loading...</div>} {/* Loading indicator */}
-//         </div>
-//       </div>
-
-//       {/* Modal component for showing the selected photo */}
-//       {selectedMinyan && (
-//         <Modal selectedMinyan={selectedMinyan} handleClose={handleClose} />
-//       )}
-//     </>
-//   );
-// }
-
-// export default Daily_Segment_History;
+export default Daily_Segments_History;
