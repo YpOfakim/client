@@ -57,6 +57,7 @@ function Create_Minyan() {
   const [time, setTime] = useState('');
   const [useCurrentLocation, setUseCurrentLocation] = useState(true);
   const [calcType, setCalcType] = useState('from-location');
+const token = localStorage.getItem("token");
 
   useEffect(() => {
     if (calcType === 'from-location') {
@@ -102,8 +103,7 @@ const handleCreateMinyan = async (e) => {
 
   const data = {
     time,
-    opener_phone: "1234567890",
-    is_daily: mode === 'is_daily' ? true : false,
+    opener_id: userId// מזהה המשתמש הפותח את המניין
   };
 
   try {
@@ -125,7 +125,10 @@ const handleCreateMinyan = async (e) => {
 
     const res = await fetch('http://localhost:3001/minyans', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${token}`
+  },
       body: JSON.stringify(data),
     });
 
@@ -146,7 +149,11 @@ const handleCreateMinyan = async (e) => {
   
 };
 
-
+  const getNowDateTimeLocal = () => {
+    const now = new Date();
+    now.setSeconds(0, 0);
+    return now.toISOString().slice(0, 16);
+  };
   return (
     <>
       {/* <h3>משתמש: {userId}</h3>
@@ -215,6 +222,7 @@ const handleCreateMinyan = async (e) => {
   <label>תאריך ושעה: </label>
   <input
     type="datetime-local"
+       min={getNowDateTimeLocal()}
     value={time}
     onChange={(e) => setTime(e.target.value)}
     required
@@ -257,14 +265,8 @@ const handleCreateMinyan = async (e) => {
             disabled={useCurrentLocation}
             placeholder="כתובת"
           />
-          <h6 style={{ color: 'gray' }}> האם המניין יומי?</h6>
         </div>
-<input
-          type="checkbox"
-          checked={mode === 'is_daily'}
-          onChange={(e) => setMode(e.target.checked ? 'is_daily' : 'not_daily')}
-          placeholder='האם מניין יומי'
-        />
+
         {error && <div style={{ color: 'red' }}>{error}</div>}
         {success && <div style={{ color: 'green' }}>{success}</div>}
         <button type="submit">צור מניין</button>

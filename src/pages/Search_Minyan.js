@@ -12,12 +12,18 @@ function Search_Minyans() {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [message, setMessage] = useState('');
-  const [desiredTime, setDesiredTime] = useState(null);
+  const [desiredTime, setDesiredTime] = useState(Date.now());
   const [sortBy, setSortBy] = useState('time');
+const token = localStorage.getItem("token");
 
   const limit = 4;
   const start = useRef(0);
   const containerRef = useRef(null);
+useEffect(() => {
+  if (userLocation) {
+    handleSearch();
+  }
+}, [userLocation]);
 
   // מיון בצד לקוח
   useEffect(() => {
@@ -100,8 +106,10 @@ function Search_Minyans() {
       if (json.length === 0 && start.current === 0) {
         setMessage("לא נמצאו מניינים");
       }
+const newIds = new Set(json.map(m => m.id));
+const filtered = originalMinyans.filter(m => !newIds.has(m.id));
+const newCombined = [...filtered, ...json];
 
-      const newCombined = [...originalMinyans, ...json];
       setOriginalMinyans(newCombined);
       start.current += limit;
 

@@ -8,8 +8,8 @@ function Register() {
   const [msg, setMsg] = useState('');
   const [userArray, setUserArray] = useState([]);
   const [newUserData, setNewUserData] = useState({
-    name: "",
-    userName: "",
+    user_name: "",
+    user_userName: "",
     email: "",
     password: "",
     verifyPassword: "",
@@ -19,59 +19,53 @@ function Register() {
   const navigate = useNavigate();
 
   // שליפת כל המשתמשים לבדיקה אם המשתמש קיים
-  useEffect(() => {
-    fetch('http://localhost:3001/users')
-      .then((res) => res.json())
-      .then((data) => setUserArray(data))
-      .catch((err) => console.error(err));
-  }, []);
+  // useEffect(() => {
+  //   fetch('http://localhost:3001/users')
+  //     .then((res) => res.json())
+  //     .then((data) => setUserArray(data))
+  //     .catch((err) => console.error(err));
+  // }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewUserData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmitRegister = async (e) => {
-    e.preventDefault();
-    const userExists = userArray.find( 
-      (u) => u.userName === newUserData.userName
-    );
+const handleSubmitRegister = async (e) => {
+  e.preventDefault(); // ✅ מוסיף את זה כדי למנוע רענון
 
-    if (userExists) {
-      setMsg("User already exists");
-      setTimeout(() => setMsg(""), 4000);
+  // בדיקות מקדימות יכולות להיכנס כאן
+
+  try {
+    const response = await fetch('http://localhost:3001/auth/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newUserData)
+    });
+
+    const data = await response.json();
+    console.log("🔍 Registration response:", data);
+
+    if (!response.ok) {
+      setMsg(data.message || "Registration failed");
       return;
     }
 
-    if (newUserData.password !== newUserData.verifyPassword) {
-      setMsg("Passwords do not match");
-      setTimeout(() => setMsg(""), 4000);
-      return;
-    }
+    const { token, user } = data;
+    console.log("User registered:", user);
 
-    try {
-      const response = await fetch('http://localhost:3001/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newUserData)
-      });
+    localStorage.setItem('authToken', token);
+    localStorage.setItem('userInfo', JSON.stringify(user));
 
-      const data = await response.json();
+    navigate(`/user/${user.user_id}/home`);
+  } catch (err) {
+    console.error("Registration error:", err);
+    setMsg("Registration failed");
+  }
+};
 
-     
-const { token, user } = data;
-
-localStorage.setItem('authToken', token);
-localStorage.setItem('userInfo', JSON.stringify(user));
-// navigate(`/user/${user.id}/home`);
-
-    } catch (err) {
-      console.error("Registration error:", err);
-      setMsg("Registration failed");
-    }
-  };
 
   return (
     <>
@@ -82,16 +76,16 @@ localStorage.setItem('userInfo', JSON.stringify(user));
         <input
           type="text"
           placeholder="Name"
-          name="name"
-          value={newUserData.name}
+          name="user_name"
+          value={newUserData.user_name}
           onChange={handleChange}
           required
         />
         <input
           type="text"
           placeholder="UserName"
-          name="userName"
-          value={newUserData.userName}
+          name="user_userName"
+          value={newUserData.user_userName}
           onChange={handleChange}
           required
         />
@@ -129,6 +123,5 @@ localStorage.setItem('userInfo', JSON.stringify(user));
       </form>
     </>
   );
-}
-
+   };
 export default Register;
