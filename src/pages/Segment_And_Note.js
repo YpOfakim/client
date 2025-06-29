@@ -1,32 +1,16 @@
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import Daily_Segment from '../components/Daily_Segment'; 
 import '../style/Style_segment_note.css';
 
 function Segment_And_Note() {
+  const { userId } = useParams();  // קבלת ה-userId מה-URL
   const [note, setNote] = useState("");
+  const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(true);
   const [today, setToday] = useState("");
 
-  useEffect(() => {
-    const currentDate = new Date().toISOString().split("T")[0];
-    setToday(currentDate);
 
-    async function fetchNote() {
-      try {
-        const res = await fetch(`http://localhost:3001/notes?date=${currentDate}`);
-        if (!res.ok) throw new Error("לא נמצאה הערה");
-        const data = await res.json();
-        setNote(data.note || "");
-      } catch (err) {
-        console.log("אין הערה קיימת, מתחילים חדשה.");
-        setNote("");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchNote();
-  }, []);
 
   const handleSaveNote = async () => {
     try {
@@ -35,7 +19,9 @@ function Segment_And_Note() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           date: today,
-          note: note
+          note: note,
+          title: title,
+          userId: userId
         })
       });
 
@@ -57,10 +43,16 @@ function Segment_And_Note() {
 
       <div className="segment-note">
         <h3>הערה אישית</h3>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="כותרת ההערה"
+        />
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          placeholder="כתוב/כתבי כאן חיזוק אישי ליום..."
+          placeholder="כתוב/י כאן הערה אישית"
         />
         <button onClick={handleSaveNote}>שמור</button>
       </div>
