@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+// import '../style/Style_Add_Note.css';
 
 function Add_Note({ userId, today }) {
   const [note, setNote] = useState("");

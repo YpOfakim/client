@@ -5,13 +5,14 @@ import { Routes, Route } from "react-router-dom";
 import Navigation from './components/Navigation'; 
 
 import Create_Minyan from './pages/Create_Minyan';
-// import Daily_Segments_History from './pages/Daily_Segments_History';
+import Daily_Segments_History from './pages/Daily_Segments_History';
 import Home from './pages/Home';
 import My_Notes from './pages/My_Notes';
 import Profile from './pages/Profile';
 import Search_Minyan from './pages/Search_Minyan';
 import Sign_In from './pages/Sign_In';
 import Sign_Up from './pages/Sign_Up';
+
 import Segment_And_Note from './pages/Segment_And_Note';
 import Sidur from './pages/Sidur';
 
@@ -36,7 +37,7 @@ function App() {
            <Route path="search_minyan" element={<Search_Minyan />} />
            <Route path="profile" element={<Profile />} />
            <Route path="my_notes" element={<My_Notes />} />
-           {/* <Route path="daily_segments_history" element={<Daily_Segments_History />} /> */}
+           <Route path="daily_segments_history" element={<Daily_Segments_History />} />
            <Route path="segments_and_note" element={<Segment_And_Note />} />
            <Route path="sidur/:prayerName" element={<Sidur />} />
          </Route>

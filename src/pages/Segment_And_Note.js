@@ -18,6 +18,7 @@ function Segment_And_Note() {
   }, []);
 
   return (
+    <div className="my-page-container">
     <div className="segment-container">
       <div className="segment-image">
         <Daily_Segment selectedDate={today} />
@@ -25,6 +26,7 @@ function Segment_And_Note() {
 
       {/* מזמן את הקומפוננטה החדשה */}
       <Add_Note userId={userId} today={today} />
+    </div>
     </div>
   );
 }
