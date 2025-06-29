@@ -26,14 +26,10 @@ const Navigation = ({ userId }) => {
         </div>
       </div>
 
-      {token ? (
+      {token&& (
         <button onClick={onLogout}>התנתק</button>
-      ) : (
-        <>
-          <NavLink to="/sign_in">התחברות</NavLink>
-          <NavLink to="/sign_up">הרשמה</NavLink>
-        </>
-      )}
+      ) 
+    }
     </nav>
   );
 };
