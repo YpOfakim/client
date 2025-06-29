@@ -1,0 +1,115 @@
+.my-notes-container {
+  display: flex;
+  gap: 24px;
+  padding: 24px;
+  background-color: #f5f0e6; /* צבע רקע בהיר חמים */
+  direction: rtl;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #4b3b2b; /* חום כהה לקריאות */
+  min-height: 100vh;
+}
+
+.add-note-section {
+  flex: 1;
+  background-color: #fef9f0; /* רקע בהיר יותר */
+  border: 2px solid #c7a17a; /* מסגרת בגוון חום חמים */
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(199, 161, 122, 0.4);
+}
+
+.notes-list-section {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+}
+
+.notes-list-box {
+  border: 2px solid #c7a17a;
+  border-radius: 12px;
+  padding: 12px;
+  max-height: 320px;
+  overflow-y: auto;
+  background-color: #fff7e6; /* צהבהב-חם */
+  box-shadow: 0 2px 6px rgba(199, 161, 122, 0.3);
+}
+
+.note-title-item {
+  padding: 12px 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #e3d7bf;
+  transition: background-color 0.3s ease;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  background-color: #fff;
+}
+
+.note-title-item:hover {
+  background-color: #d8c4a3;
+  color: #2e1f0f;
+}
+
+.note-date {
+  font-size: 0.85em;
+  color: #7a6a53;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.selected-note-body {
+  margin-top: 24px;
+  padding: 16px;
+  border: 2px solid #c7a17a;
+  border-radius: 12px;
+  background: #fff7e6;
+  box-shadow: 0 3px 10px rgba(199, 161, 122, 0.4);
+  max-height: 280px;
+  overflow-y: auto;
+  direction: rtl;
+  color: #4b3b2b;
+}
+
+.selected-note-body h4 {
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.note-body {
+  padding: 10px;
+  border: 1px solid #c7a17a;
+  border-radius: 8px;
+  background: #fdf5e6;
+  max-height: 220px;  
+  overflow-y: auto;
+  line-height: 1.5;
+}
+
+/* Scrollbar - קלאסי ונעים */
+.notes-list-box::-webkit-scrollbar,
+.selected-note-body::-webkit-scrollbar,
+.note-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.notes-list-box::-webkit-scrollbar-track,
+.selected-note-body::-webkit-scrollbar-track,
+.note-body::-webkit-scrollbar-track {
+  background: #f5f0e6;
+  border-radius: 8px;
+}
+
+.notes-list-box::-webkit-scrollbar-thumb,
+.selected-note-body::-webkit-scrollbar-thumb,
+.note-body::-webkit-scrollbar-thumb {
+  background-color: #c7a17a;
+  border-radius: 8px;
+  border: 2px solid #f5f0e6;
+}
+
+/* למכשירים שאינם WebKit */
+.notes-list-box,
+.selected-note-body,
+.note-body {
+  scrollbar-width: thin;
+  scrollbar-color: #c7a17a #f5f0e6;
+}

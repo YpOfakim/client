@@ -40,3 +40,24 @@
   border-radius: 6px;
   cursor: pointer;
 }
+.save-message {
+  color: green;
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+.segment-note button:hover {
+  background-color: #45a049;
+}
+.save-message.success {
+  color: green;
+  margin-top: 5px;
+}
+
+.save-message.error {
+  color: red;
+  margin-top: 5px;
+}
+body, .segment-container {
+  direction: rtl;
+  text-align: right;
+}
