@@ -12,46 +12,41 @@ import Profile from './pages/Profile';
 import Search_Minyan from './pages/Search_Minyan';
 import Sign_In from './pages/Sign_In';
 import Sign_Up from './pages/Sign_Up';
-
 import Segment_And_Note from './pages/Segment_And_Note';
 import Sidur from './pages/Sidur';
 
+import ProtectedRoute from './components/ProtectedRoute'; // ✅
 
 function App() {
- 
-
   return (
+    <AuthProvider>
+      <Routes>
+<Route path="/" element={<Front_Home />} />
+        <Route path="sign_in" element={<Sign_In />} />
+        <Route path="sign_up" element={<Sign_Up />} />
 
-
-
-     <AuthProvider>
-       <Routes>
-         <Route index element={<Front_Home/>} />
-         <Route path="sign_in" element={<Sign_In />} />
-         <Route path="sign_up" element={<Sign_Up />} />
-
-         {/* עטיפת הדפים שרוצים בהם ניווט */}
+        {/* ✅ עטיפת כל המסלולים המוגנים בתוך ProtectedRoute */}
+        <Route element={<ProtectedRoute />}>
           <Route path="user/:userId" element={<LayoutWithNav />}>
-           <Route path="home" element={<Home />} />
-           <Route path="create_minyan" element={<Create_Minyan />} />
-           <Route path="search_minyan" element={<Search_Minyan />} />
-           <Route path="profile" element={<Profile />} />
-           <Route path="my_notes" element={<My_Notes />} />
-           <Route path="daily_segments_history" element={<Daily_Segments_History />} />
-           <Route path="segments_and_note" element={<Segment_And_Note />} />
-           <Route path="sidur/:prayerName" element={<Sidur />} />
-         </Route>
-         <Route path="*" element={<NoMatch />} />
-       </Routes>
-     </AuthProvider>
-     
+            <Route path="home" element={<Home />} />
+            <Route path="create_minyan" element={<Create_Minyan />} />
+            <Route path="search_minyan" element={<Search_Minyan />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="my_notes" element={<My_Notes />} />
+            <Route path="daily_segments_history" element={<Daily_Segments_History />} />
+            <Route path="segments_and_note" element={<Segment_And_Note />} />
+            <Route path="sidur/:prayerName" element={<Sidur />} />
+          </Route>
+        </Route>
+
+        <Route path="*" element={<NoMatch />} />
+      </Routes>
+    </AuthProvider>
   );
 }
 
-// New layout for user-specific routes
 const LayoutWithNav = () => {
   const { userId } = useParams();
-
   return (
     <>
       <Navigation userId={userId} />
@@ -61,25 +56,36 @@ const LayoutWithNav = () => {
     </>
   );
 };
-const AuthContext = React.createContext(null);
 
+const AuthContext = React.createContext(null);
 
 const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
-  const [token, setToken] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [userInfo, setUserInfo] = useState(
+    JSON.parse(localStorage.getItem("userInfo") || "{}")
+  );
 
-  const handleLogin = async () => {
-    const token = 'sample_token'; // Placeholder token
+  const handleLogin = async (token, userInfo) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("userInfo", JSON.stringify(userInfo));
     setToken(token);
-    navigate('/home');
+    setUserInfo(userInfo);
+    navigate(`/user/${userInfo.user_id}/home`);
   };
 
   const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userInfo");
     setToken(null);
+    setUserInfo(null);
+    navigate("/");
   };
 
   const value = {
     token,
+    userInfo,
+    isLoggedIn: !!token,
     onLogin: handleLogin,
     onLogout: handleLogout,
   };
@@ -92,19 +98,15 @@ const NoMatch = () => {
 };
 
 export default App;
-export {  AuthContext , AuthProvider, NoMatch };
-
-
+export { AuthContext, AuthProvider, NoMatch };
 
 const Front_Home = () => {
   return (
     <div>
-      <h1>Welcome to the App</h1>
-      <p>Please log in or register to continue.</p>
-      <NavLink to="/sign_in">Login</NavLink>
-      <NavLink to="/sign_up">Register</NavLink>
+      <h1>בלכתך בדרך</h1>
+      <p>נא להתחבר או להרשם כדי</p>
+      <NavLink to="/sign_in">התחברות</NavLink>
+      <NavLink to="/sign_up">הרשמה</NavLink>
     </div>
   );
 };
-
-

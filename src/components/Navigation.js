@@ -8,8 +8,14 @@ const Navigation = ({ userId }) => {
 
   return (
     <nav className="nav-bar">
-      <NavLink to={`/user/${userId}/home`}>בית</NavLink>
-      <NavLink to={`/user/${userId}/profile`}>הפרופיל שלי</NavLink>
+       <NavLink 
+  to={`/user/${userId}/home`} 
+  className={({ isActive }) => isActive ? 'active' : ''}
+>
+  בית
+</NavLink>
+           <NavLink to={`/user/${userId}/profile`}>הפרופיל שלי</NavLink>
+
       <NavLink to={`/user/${userId}/create_minyan`}>צור מניין</NavLink>
       <NavLink to={`/user/${userId}/search_minyan`}>חיפוש מניין</NavLink>
       <NavLink to={`/user/${userId}/daily_segments_history`}>היסטוריית חיזוקים</NavLink>
@@ -25,11 +31,12 @@ const Navigation = ({ userId }) => {
           <NavLink to={`/user/${userId}/sidur/Maariv`}>ערבית</NavLink>
         </div>
       </div>
-      
-      {token&& (
-        <button onClick={onLogout}>התנתק</button>
-      )}
 
+       {token && (
+  <div className="logout-container">
+    <button className="logout-button" onClick={onLogout}>התנתק</button>
+  </div>
+)}
     </nav>
   );
 };

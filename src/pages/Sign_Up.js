@@ -2,9 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function Register() {
-    localStorage.removeItem("authToken");
-  localStorage.removeItem("userInfo");
-  localStorage.removeItem("currentSpe");
   const [msg, setMsg] = useState('');
   const [userArray, setUserArray] = useState([]);
   const [newUserData, setNewUserData] = useState({
@@ -18,59 +15,85 @@ function Register() {
 
   const navigate = useNavigate();
 
-  // שליפת כל המשתמשים לבדיקה אם המשתמש קיים
-  // useEffect(() => {
-  //   fetch('http://localhost:3001/users')
-  //     .then((res) => res.json())
-  //     .then((data) => setUserArray(data))
-  //     .catch((err) => console.error(err));
-  // }, []);
+  // ניקוי לוקאל סטורג' בעת טעינה
+  useEffect(() => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userInfo");
+    localStorage.removeItem("currentSpe");
+  }, []);
+
+  // פונקציה להצגת הודעה זמנית
+  const showMessage = (message) => {
+    setMsg(message);
+    setTimeout(() => setMsg(""), 4000);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewUserData((prev) => ({ ...prev, [name]: value }));
   };
 
-const handleSubmitRegister = async (e) => {
-  e.preventDefault(); // ✅ מוסיף את זה כדי למנוע רענון
+  const handleSubmitRegister = async (e) => {
+    e.preventDefault();
 
-  // בדיקות מקדימות יכולות להיכנס כאן
-
-  try {
-    const response = await fetch('http://localhost:3001/auth/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(newUserData)
-    });
-
-    const data = await response.json();
-    console.log("🔍 Registration response:", data);
-
-    if (!response.ok) {
-      setMsg(data.message || "Registration failed");
+    if (newUserData.password !== newUserData.verifyPassword) {
+      showMessage("הסיסמאות אינן תואמות");
       return;
     }
 
-    const { token, user } = data;
-    console.log("User registered:", user);
+    if (newUserData.password.length < 6) {
+      showMessage("הסיסמה חייבת להכיל לפחות 6 תווים");
+      return;
+    }
 
-    localStorage.setItem('authToken', token);
-    localStorage.setItem('userInfo', JSON.stringify(user));
+    if (newUserData.phone && !/^\d{9,10}$/.test(newUserData.phone)) {
+      showMessage("מספר טלפון לא תקין");
+      return;
+    }
 
-    navigate(`/user/${user.user_id}/home`);
-  } catch (err) {
-    console.error("Registration error:", err);
-    setMsg("Registration failed");
-  }
-};
+    try {
+      const response = await fetch('http://localhost:3001/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newUserData)
+      });
 
+      const data = await response.json();
+
+      if (!response.ok) {
+        showMessage(data.message || "הרישום נכשל");
+        return;
+      }
+
+      const { token, user } = data;
+
+      localStorage.setItem('token', token);
+      localStorage.setItem('userInfo', JSON.stringify(user));
+
+      navigate(`/user/${user.user_id}/home`);
+    } catch (err) {
+      console.error("שגיאה ברישום:", err);
+      showMessage("שגיאת שרת: נסה שוב מאוחר יותר");
+    }
+  };
 
   return (
     <>
       <h3>Register:</h3>
-      {msg && <p style={{ color: "red" }}>{msg}</p>}
+
+      {msg && (
+        <div style={{
+          backgroundColor: "#ffe6e6",
+          color: "#cc0000",
+          padding: "10px",
+          border: "1px solid #cc0000",
+          borderRadius: "5px",
+          marginBottom: "10px",
+          maxWidth: "300px"
+        }}>
+          {msg}
+        </div>
+      )}
 
       <form onSubmit={handleSubmitRegister}>
         <input
@@ -123,5 +146,6 @@ const handleSubmitRegister = async (e) => {
       </form>
     </>
   );
-   };
+}
+
 export default Register;

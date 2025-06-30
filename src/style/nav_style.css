@@ -32,6 +32,23 @@
   color: #2e1f0f;
   border-radius: 8px;
 }
+.logout-button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 0.5em 1em;
+  margin-right: 1em;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.nav-bar .active {
+  font-weight: bold;
+  color: #007bff;
+}
+
+.logout-button:hover {
+  background-color: #d32f2f;
+}
 
 .dropdown {
   position: relative;
