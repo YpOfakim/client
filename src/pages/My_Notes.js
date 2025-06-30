@@ -8,6 +8,8 @@ function My_Notes() {
   const [today, setToday] = useState("");
   const [notes, setNotes] = useState([]);
   const [selectedNote, setSelectedNote] = useState(null);
+  const [refreshNotes, setRefreshNotes] = useState(false);
+
 
   const formatDate = (isoString) => {
   const date = new Date(isoString);
@@ -28,25 +30,26 @@ function My_Notes() {
   }, []);
 
   // טוען את ההערות של המשתמש
-  useEffect(() => {
-    async function fetchNotes() {
-      try {
-        const res = await fetch(`http://localhost:3001/notes/${userId}`);
-        if (!res.ok) throw new Error("שגיאה בקבלת ההערות");
-        const data = await res.json();
-        setNotes(data);
-      } catch (err) {
-        console.error("שגיאה בטעינת ההערות:", err);
-      }
+useEffect(() => {
+  async function fetchNotes() {
+    try {
+      const res = await fetch(`http://localhost:3001/notes/${userId}`);
+      if (!res.ok) throw new Error("שגיאה בקבלת ההערות");
+      const data = await res.json();
+      setNotes(data);
+    } catch (err) {
+      console.error("שגיאה בטעינת ההערות:", err);
     }
+  }
 
-    fetchNotes();
-  }, [userId]);
+  fetchNotes();
+}, [userId, refreshNotes]); // refreshNotes גורם לריצה מחדש
+
 
   return (
     <div className="my-notes-container">
       <div className="add-note-section">
-        <Add_Note userId={userId} today={today} />
+        <Add_Note userId={userId} today={today} onNoteAdded={() => setRefreshNotes(prev => !prev)} />
       </div>
 
       <div className="notes-list-section">
