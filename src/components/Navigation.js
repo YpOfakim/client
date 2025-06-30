@@ -14,8 +14,7 @@ const Navigation = ({ userId }) => {
 >
   בית
 </NavLink>
-           <NavLink to={`/user/${userId}/profile`}>הפרופיל שלי</NavLink>
-
+      <NavLink to={`/user/${userId}/profile`}>הפרופיל שלי</NavLink>
       <NavLink to={`/user/${userId}/create_minyan`}>צור מניין</NavLink>
       <NavLink to={`/user/${userId}/search_minyan`}>חיפוש מניין</NavLink>
       <NavLink to={`/user/${userId}/daily_segments_history`}>היסטוריית חיזוקים</NavLink>
