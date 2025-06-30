@@ -11,17 +11,35 @@
 
 .add-note-section {
   flex: 1;
-  background-color: #fef9f0; /* רקע בהיר יותר */
-  border: 2px solid #c7a17a; /* מסגרת בגוון חום חמים */
+  /* background-color: #fef9f0; רקע בהיר יותר */
+  /* border: 2px solid #c7a17a; */  /* מסגרת בגוון חום חמים - הוסר */
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(199, 161, 122, 0.4);
+  /* box-shadow: 0 2px 8px rgba(199, 161, 122, 0.4); */ /* הוסר */
 }
 
 .notes-list-section {
   flex: 2;
   display: flex;
   flex-direction: column;
+}
+
+.note-title-input {
+  padding: 10px;
+  border: 1px solid #c7a17a;
+  border-radius: 8px;
+  background: #fdf5e6;
+  color: #4b3b2b;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+}
+
+.note-title-input:focus {
+  outline: none;
+  border-color: #a67c52;
+  box-shadow: 0 0 4px rgba(166, 124, 82, 0.5);
 }
 
 .notes-list-box {
@@ -45,7 +63,7 @@
 }
 
 .note-title-item:hover {
-  background-color: #d8c4a3;
+  background-color: #cebdab; 
   color: #2e1f0f;
 }
 
@@ -59,14 +77,14 @@
 .selected-note-body {
   margin-top: 24px;
   padding: 16px;
-  border: 2px solid #c7a17a;
+  border: none;
   border-radius: 12px;
-  background: #fff7e6;
-  box-shadow: 0 3px 10px rgba(199, 161, 122, 0.4);
+  background:#cebdab; 
+  box-shadow: none; 
   max-height: 280px;
   overflow-y: auto;
   direction: rtl;
-  color: #4b3b2b;
+  color: #624119;
 }
 
 .selected-note-body h4 {
@@ -101,7 +119,7 @@
 .notes-list-box::-webkit-scrollbar-thumb,
 .selected-note-body::-webkit-scrollbar-thumb,
 .note-body::-webkit-scrollbar-thumb {
-  background-color: #c7a17a;
+  background-color: #cebdab; 
   border-radius: 8px;
   border: 2px solid #f5f0e6;
 }

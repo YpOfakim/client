@@ -43,6 +43,7 @@ function Add_Note({ userId, today }) {
     <div className="segment-note">
       <h3>הערה אישית</h3>
       <input
+       className="note-title-input"
         type="text"
         value={title}
         onChange={(e) => setTitle(e.target.value)}

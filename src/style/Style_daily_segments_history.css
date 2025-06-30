@@ -1,0 +1,101 @@
+.daily-segments-container {
+  display: flex;
+  direction: rtl;
+  height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #4b3b2b;
+  overflow: hidden;
+  padding-right: 1rem; /* רווח מהקצה הימני */
+    background-color: #fef9f0;
+
+}
+
+/* תיבת רשימת התאריכים */
+.date-list-section {
+  width: 40%;             /* רוחב גמיש ונוח */
+  max-width: 350px;
+  min-width: 250px;
+  height: 60%;
+  display: flex;
+  flex-direction: column;
+  background-color: #fef9f0; /* רקע בהיר ונעים */
+  border-radius: 12px;
+  padding: 20px;
+  box-sizing: border-box;
+  margin-right: 4rem;  /* הריווח מהקצה הימני */
+  margin-top: 4rem;;
+  box-shadow: 0 2px 8px rgba(199, 161, 122, 0.3); /* צל עדין */
+  border: none;
+  border-left: 2px solid #c7a17a; /* קו צד שמאל */
+
+}
+
+/* כותרת בתוך המלבן */
+.date-list-section h3 {
+  margin: 0;
+  padding: 1rem 0;
+  text-align: center;
+  background-color: #fef9f0;
+  border-bottom: 1px solid #c7a17a;
+  user-select: none;
+}
+
+/* אזור הגלילה של התאריכים */
+.date-list-section-scroll {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 0.5rem;
+  padding-right: 8px;    /* ריווח לצד הגלילה */
+  direction: ltr;        /* כדי שהגלילה תהיה בצד ימין */
+  scrollbar-width: thin;
+  scrollbar-color: #c7a17a #f5f0e6;
+}
+
+/* גלילה ב-webkit */
+.date-list-section-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.date-list-section-scroll::-webkit-scrollbar-track {
+  background: #f5f0e6;
+  border-radius: 8px;
+}
+.date-list-section-scroll::-webkit-scrollbar-thumb {
+  background-color: #c7a17a;
+  border-radius: 8px;
+  border: 2px solid #f5f0e6;
+}
+
+/* כל תאריך ברשימה */
+.date-item {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  user-select: none;
+  border: 1px solid transparent;
+}
+
+/* הובר קל לתאריך */
+.date-item:hover {
+  background-color: #e3d7bf;
+  color: #2e1f0f;
+}
+
+/* תאריך נבחר */
+.date-item.active {
+  background-color: #a9845c;
+  color: #fff;
+  font-weight: bold;
+  border-color: #7a5e37;
+}
+
+/* אזור התוכן של התאריך שנבחר */
+.segment-display-section {
+  flex: 1;
+  padding: 1rem;
+  border-radius: 12px;
+  overflow-y: auto;
+}

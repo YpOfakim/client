@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Daily_Segment from '../components/Daily_Segment';
+import '../style/Style_daily_segments_history.css';
 
 function Daily_Segments_History() {
   const [segments, setSegments] = useState([]);
@@ -40,41 +41,34 @@ function Daily_Segments_History() {
       });
   }, []);
 
-  return (
-    <div style={{ display: 'flex', direction: 'rtl', height: '100%' }}>
-      <div style={{ width: '30%', overflowY: 'auto', borderLeft: '1px solid lightgray', padding: '1rem' }}>
-        <h3>היסטוריית חיזוקים</h3>
-        {loading ? (
-          <p>טוען חיזוקים...</p>
-        ) : segments.length === 0 ? (
-          <p>לא נמצאו חיזוקים</p>
-        ) : (
-          segments.map(segment => (
-            <div
-              key={segment.dateOnly}
-              onClick={() => setSelectedDate(segment.dateOnly)}
-              style={{
-                padding: '0.5rem',
-                marginBottom: '0.5rem',
-                cursor: 'pointer',
-                backgroundColor: selectedDate === segment.dateOnly ? '#d1e7dd' : 'transparent',
-                borderRadius: '8px',
-                textAlign: 'center'
-              }}
-            >
-              {new Date(segment.dateOnly).toLocaleDateString('he-IL')}
-            </div>
-          ))
-        )}
+return (
+  <div className="daily-segments-container">
+    <div className="date-list-section">
+      <h3>היסטוריית חיזוקים</h3>
+<div className="date-list-section-scroll">
+  {loading ? (
+    <p>טוען חיזוקים...</p>
+  ) : segments.length === 0 ? (
+    <p>לא נמצאו חיזוקים</p>
+  ) : (
+    segments.map(segment => (
+      <div
+        key={segment.dateOnly}
+        onClick={() => setSelectedDate(segment.dateOnly)}
+        className={`date-item ${selectedDate === segment.dateOnly ? "active" : ""}`}
+      >
+        {new Date(segment.dateOnly).toLocaleDateString('he-IL')}
       </div>
-
-      <div style={{ flex: 1, padding: '1rem' }}>
-        {selectedDate && (
-          <Daily_Segment selectedDate={selectedDate} />
-        )}
-      </div>
+    ))
+  )}
+</div>
     </div>
-  );
+
+    <div className="segment-display-section">
+      {selectedDate && <Daily_Segment selectedDate={selectedDate} />}
+    </div>
+  </div>
+);
 }
 
 export default Daily_Segments_History;

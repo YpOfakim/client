@@ -8,7 +8,6 @@ import Prayer from '../components/Prayer';
 
   return (
     <div>
-      <h2>תפילה: {prayerName}</h2>
       <Prayer />
     </div>
   );
