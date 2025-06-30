@@ -1,0 +1,65 @@
+.profile-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem 2.5rem;
+  background-color: #fffdf8; /* רקע של תיבת ההסבר */
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(199, 161, 122, 0.2);
+  color: #4b3b2b;
+  direction: rtl;
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+.profile-container h1 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #a9845c;
+}
+
+.profile-container h5 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0.7rem 0;
+  color: #4b3b2b;
+}
+
+.profile-container input {
+  width: 100%;
+  max-width: 400px;
+  padding: 0.6rem 1rem;
+  margin: 0.6rem 0;
+  border: 1.5px solid #c7a17a;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #4b3b2b;
+  background-color: #f9f4ea;
+  box-sizing: border-box;
+  text-align: right;
+  direction: rtl;
+  transition: border-color 0.3s ease;
+}
+
+.profile-container input:focus {
+  border-color: #a9845c;
+  outline: none;
+  background-color: #fff;
+}
+
+.profile-container button {
+  background-color: #a9845c;
+  border: none;
+  color: white;
+  padding: 0.7rem 1.6rem;
+  margin: 1rem 0.5rem 0 0.5rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.profile-container button:hover {
+  background-color: #7a5e37;
+}

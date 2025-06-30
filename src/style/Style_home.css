@@ -1,0 +1,43 @@
+.home-page {
+  background-color: #f5f0e6; /* רקע לדף */
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+}
+
+/* קונטיינר של התוכן */
+.home-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #fffdf8; /* רקע של תיבת ההסבר */
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(199, 161, 122, 0.2);
+  color: #4b3b2b;
+  direction: rtl;
+  text-align: center;
+}
+
+.home-container h1 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #a9845c;
+}
+
+.home-container h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.home-container pre {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  background-color: #f9f4ea;
+  padding: 1.5rem;
+  border-radius: 12px;
+  white-space: pre-wrap;
+  box-shadow: inset 0 0 6px rgba(199, 161, 122, 0.2);
+  text-align: justify;
+}

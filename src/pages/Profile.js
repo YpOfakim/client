@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import "../style/Style_profile.css";
 function Profile() {
   const [editMode, setEditMode] = useState(false);
   const [userInfo, setUserInfo] = useState(
@@ -48,8 +48,9 @@ const res = await fetch(`http://localhost:3001/users/${user_id}`, {
 
 
 
-  return (
-    <>
+return (
+  <div style={{ backgroundColor: '#f5f0e6', minHeight: '100vh', padding: '3rem 1rem' }}>
+    <div className="profile-container">
       <h1>פרופיל משתמש</h1>
 
       {editMode ? (
@@ -90,8 +91,9 @@ const res = await fetch(`http://localhost:3001/users/${user_id}`, {
           <button onClick={() => setEditMode(true)}>ערוך</button>
         </>
       )}
-    </>
-  );
+    </div>
+  </div>
+);
 }
 
 export default Profile;
