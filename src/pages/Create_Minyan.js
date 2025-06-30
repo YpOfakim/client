@@ -58,6 +58,7 @@ function Create_Minyan() {
   const [useCurrentLocation, setUseCurrentLocation] = useState(true);
   const [calcType, setCalcType] = useState('from-location');
 const token = localStorage.getItem("token");
+const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
 
   useEffect(() => {
@@ -152,7 +153,66 @@ console.log("Data:", data);
     
   }
   
+const handleCreateMinyan = async (e) => {
+  e.preventDefault();
+  setError('');
+  setSuccess('');
+
+  if (!time) {
+    setError('נא להזין תאריך ושעה');
+    return;
+  }
+
+  const data = {
+    time,
+    opener_id: userId,
+    opener_phone: userInfo?.phone || ''
+  };
+
+  try {
+    if (useCurrentLocation) {
+      if (!location) {
+        setError('נא לקבל מיקום');
+        return;
+      }
+      data.location = location;
+      data.address = null;
+    } else {
+      if (!address) {
+        setError('נא להזין כתובת');
+        return;
+      }
+      data.address = address;
+      data.location = null;
+    }
+
+    console.log("Token from localStorage:", token);
+    console.log("Data:", data);
+
+    const res = await fetch('http://localhost:3001/minyans', {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (res.ok) {
+      setSuccess('מניין נוצר בהצלחה!');
+      setTime('');
+      setAddress('');
+      setLocation(null);
+    } else {
+      const errData = await res.json();
+      setError(errData.error || 'שגיאה ביצירת מניין');
+    }
+  } catch (err) {
+    console.error(err);
+    setError('שגיאת שרת');
+  }
 };
+  };
 
   const getNowDateTimeLocal = () => {
     const now = new Date();

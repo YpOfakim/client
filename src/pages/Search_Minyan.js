@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Minyan from '../components/Minyan';
 import "../style/minyans.css";
 import SortOptions from '../components/SortOptions';
+import { useParams, Navigate,useNavigate } from 'react-router-dom';
 
 function Search_Minyans() {
   const [minyans, setMinyans] = useState([]);
@@ -19,6 +20,13 @@ function Search_Minyans() {
   const limit = 4;
   const start = useRef(0);
   const containerRef = useRef(null);
+const { userId } = useParams(); // מה-URL
+const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+  const navigate = useNavigate();
+
+if (!userInfo.user_id || String(userInfo.user_id) !== userId) {
+ navigate('/404'); // אם המשתמש לא מחובר או שה־userId לא תואם, נווט לעמוד 404
+}
 
   useEffect(() => {
     if (userLocation) {
