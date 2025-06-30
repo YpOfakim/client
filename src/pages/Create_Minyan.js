@@ -57,7 +57,8 @@ function Create_Minyan() {
   const [time, setTime] = useState('');
   const [useCurrentLocation, setUseCurrentLocation] = useState(true);
   const [calcType, setCalcType] = useState('from-location');
-const token = localStorage.getItem("token");
+const token = localStorage.getItem("Token");
+
 
   useEffect(() => {
     if (calcType === 'from-location') {
