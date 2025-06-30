@@ -3,6 +3,7 @@ import { Outlet, NavLink, useNavigate, useParams } from "react-router-dom";
 import { useContext, useState } from 'react';
 import { Routes, Route } from "react-router-dom";
 import Navigation from './components/Navigation'; 
+import './style/front_home.css';
 
 import Create_Minyan from './pages/Create_Minyan';
 import Daily_Segments_History from './pages/Daily_Segments_History';
@@ -100,13 +101,16 @@ const NoMatch = () => {
 export default App;
 export { AuthContext, AuthProvider, NoMatch };
 
+
 const Front_Home = () => {
   return (
-    <div>
-      <h1>בלכתך בדרך</h1>
-      <p>נא להתחבר או להרשם כדי</p>
-      <NavLink to="/sign_in">התחברות</NavLink>
-      <NavLink to="/sign_up">הרשמה</NavLink>
+    <div className="front-home-page">
+      <div className="front-home-container">
+        <h1>בלכתך בדרך</h1>
+        <p>נא להתחבר או להירשם כדי להמשיך</p>
+        <NavLink to="/sign_in">התחברות</NavLink>
+        <NavLink to="/sign_up">הרשמה</NavLink>
+      </div>
     </div>
   );
 };

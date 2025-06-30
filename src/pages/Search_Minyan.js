@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Minyan from '../components/Minyan';
-import "../style/minyans.css";
 import SortOptions from '../components/SortOptions';
 
 function Search_Minyans() {

@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useContext } from "react";
-import { AuthContext } from "../App"; // או מה שצריך בהתאם למיקום שלך
-
+import { AuthContext } from "../App"; 
+import "../style/login.css"; 
 function Login() {
   // ניקוי נתונים קודמים מה־localStorage
   useEffect(() => {
@@ -58,42 +58,51 @@ onLogin(data.token, data.user);
     setShowPassword((prev) => !prev);
   };
 
-  return (
-    <form className="login" onSubmit={handleLogin}>
-      <h1>התחברות</h1>
+ return (
+    <div className="login-page">
+      <form className="login" onSubmit={handleLogin}>
+        <h1>התחברות</h1>
 
-      {error && <p className="error-message">{error}</p>}
+        {error && <p className="error-message">{error}</p>}
 
-      <input
-        type="text"
-        placeholder="שם משתמש"
-        value={userName}
-        onChange={handleInputChange(setUserName)}
-      />
-
-      <div className="password-container">
         <input
-          type={showPassword ? "text" : "password"}
-          placeholder="סיסמה"
-          value={password}
-          onChange={handleInputChange(setPassword)}
+          type="text"
+          placeholder="שם משתמש"
+          value={userName}
+          onChange={handleInputChange(setUserName)}
         />
-        <button
-          type="button"
-          className="toggle-password"
-          onClick={toggleShowPassword}
-          tabIndex={-1}
-        >
-          {showPassword ? "🙈" : "👁️"}
-        </button>
-      </div>
 
-      <button type="submit" disabled={!userName || !password}>
-        התחבר
+        <div className="password-container">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="סיסמה"
+            value={password}
+            onChange={handleInputChange(setPassword)}
+          />
+          <button
+            type="button"
+            className="toggle-password"
+            onClick={toggleShowPassword}
+            tabIndex={-1}
+          >
+            {showPassword ? "🙈" : "👁️"}
+          </button>
+        </div>
+
+        <button type="submit" disabled={!userName || !password}>
+          התחבר
+        </button>
+        <button
+        type="button"
+        className="register-link"
+        onClick={() => navigate("/sign_up")}
+      >
+        אין לך חשבון? לחץ כאן להרשמה
       </button>
-    </form>
-  );
-}
+      </form>
+    </div>
+  );}
+
 
 
 export default Login;

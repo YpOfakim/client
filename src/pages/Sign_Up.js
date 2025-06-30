@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import '../style/register.css'; 
+
 
 function Register() {
   const [msg, setMsg] = useState('');
@@ -77,28 +79,20 @@ function Register() {
     }
   };
 
-  return (
-    <>
-      <h3>Register:</h3>
+ return (
+    <div className="register-page">
+      <form className="register-form" onSubmit={handleSubmitRegister}>
+        <h3>הרשמה</h3>
 
-      {msg && (
-        <div style={{
-          backgroundColor: "#ffe6e6",
-          color: "#cc0000",
-          padding: "10px",
-          border: "1px solid #cc0000",
-          borderRadius: "5px",
-          marginBottom: "10px",
-          maxWidth: "300px"
-        }}>
-          {msg}
-        </div>
-      )}
+        {msg && (
+          <div className="error-box">
+            {msg}
+          </div>
+        )}
 
-      <form onSubmit={handleSubmitRegister}>
         <input
           type="text"
-          placeholder="Name"
+          placeholder="שם"
           name="user_name"
           value={newUserData.user_name}
           onChange={handleChange}
@@ -106,7 +100,7 @@ function Register() {
         />
         <input
           type="text"
-          placeholder="UserName"
+          placeholder="שם משתמש"
           name="user_userName"
           value={newUserData.user_userName}
           onChange={handleChange}
@@ -114,7 +108,7 @@ function Register() {
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder="סיסמה"
           name="password"
           value={newUserData.password}
           onChange={handleChange}
@@ -122,7 +116,7 @@ function Register() {
         />
         <input
           type="password"
-          placeholder="Verify Password"
+          placeholder="אימות סיסמה"
           name="verifyPassword"
           value={newUserData.verifyPassword}
           onChange={handleChange}
@@ -130,21 +124,28 @@ function Register() {
         />
         <input
           type="email"
-          placeholder="Email"
+          placeholder="אימייל"
           name="email"
           value={newUserData.email}
           onChange={handleChange}
         />
         <input
           type="text"
-          placeholder="Phone"
+          placeholder="טלפון"
           name="phone"
           value={newUserData.phone}
           onChange={handleChange}
         />
-        <button type="submit">Register</button>
+        <button type="submit">הרשם</button>
+        <button
+        type="button"
+        className="register-link"
+        onClick={() => navigate("/sign_in")}
+      >
+        קיים לך כבר חשבון? לחץ כאן להתחברות
+      </button>
       </form>
-    </>
+    </div>
   );
 }
 

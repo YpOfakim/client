@@ -1,0 +1,59 @@
+.register-page {
+  background-color: #f5f0e6; /* רקע כללי */
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+  font-family: 'Almoni DL', sans-serif;
+}
+
+.register-form {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #fffdf8; /* תיבת הטופס */
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(199, 161, 122, 0.2);
+  direction: rtl;
+  text-align: center;
+}
+
+.register-form h3 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #a9845c;
+  margin-bottom: 1.5rem;
+}
+
+.register-form input {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.register-form button {
+  background-color: #a9845c;
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.register-form button:hover {
+  background-color: #8b6a4f;
+}
+
+.error-box {
+  background-color: #ffe6e6;
+  color: #cc0000;
+  padding: 10px;
+  border: 1px solid #cc0000;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}

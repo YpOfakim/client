@@ -1,0 +1,83 @@
+.create-minyan-page {
+  background-color: #f5f0e6; /* רקע כללי */
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+  font-family: 'Almoni DL', sans-serif;
+}
+
+.create-minyan-form {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #fffdf8;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(199, 161, 122, 0.2);
+  direction: rtl;
+}
+
+.create-minyan-form h2 {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #a9845c;
+  margin-bottom: 1.5rem;
+}
+
+.create-minyan-form div {
+  margin-bottom: 1rem;
+}
+
+.create-minyan-form label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #4b3b2b;
+}
+
+.create-minyan-form input[type="datetime-local"],
+.create-minyan-form input[type="text"] {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.create-minyan-form input[type="radio"] {
+  margin-left: 0.5rem;
+}
+
+.create-minyan-form button {
+  background-color: #a9845c;
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+.create-minyan-form button:hover {
+  background-color: #8b6a4f;
+}
+
+.create-minyan-form span {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #4b3b2b;
+}
+
+.create-minyan-form .success-message {
+  color: green;
+  margin-top: 1rem;
+}
+
+.create-minyan-form .error-message {
+  color: red;
+  margin-top: 1rem;
+}

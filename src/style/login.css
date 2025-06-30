@@ -1,0 +1,94 @@
+.login-page {
+  background-color: #f5f0e6; /* רקע לדף */
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+  font-family: 'Almoni DL', sans-serif;
+}
+
+.login {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #fffdf8; /* תיבת הטופס */
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(199, 161, 122, 0.2);
+  direction: rtl;
+  text-align: center;
+}
+
+.login h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #a9845c;
+  margin-bottom: 1.5rem;
+}
+
+.login input {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.password-container {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  left: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.login button[type="submit"] {
+  background-color: #a9845c;
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login button[type="submit"]:hover {
+  background-color: #8b6a4f;
+}
+
+.login button[type="submit"]:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: red;
+  margin-bottom: 1rem;
+}
+.register-link {
+  background-color: #a9845c;
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: block; 
+  width: 100%;    
+  margin-top: 1.5rem;
+  text-decoration: none;
+}
+
+
+.register-link:hover {
+  background-color: #8b6a4f;
+}

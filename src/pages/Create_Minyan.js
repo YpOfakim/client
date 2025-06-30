@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, useParams } from 'react-router-dom';
-import "../style/minyans.css"; // Assuming you have styles for the minyans
-
+import '../style/create-minyan.css';
 const GOOGLE_API_KEY = 'AIzaSyCVdsExOdchWIspVTLcCOgScugWBmgBllw';
 
 function getUserLocation() {
@@ -160,8 +159,8 @@ console.log("Data:", data);
     return now.toISOString().slice(0, 16);
   };
   return (
-    <>
-      {/* <h3>משתמש: {userId}</h3>
+    
+      /*{ <h3>משתמש: {userId}</h3>
       <div>
         <label>
           <input
@@ -178,10 +177,10 @@ console.log("Data:", data);
             checked={calcType === 'between-addresses'}
             onChange={() => setCalcType('between-addresses')}
           /> חישוב בין כתובות
-        </label> */}
-      {/* </div> */}
+        </label> }*/
+      // {/* </div> */}
 
-      {/* <form onSubmit={handleAddressSubmit}>
+      /* {<form onSubmit={handleAddressSubmit}>
         {calcType === 'from-location' ? (
           <input
             type="text"
@@ -220,69 +219,70 @@ console.log("Data:", data);
         </div>
       )}
 
-      <hr /> */}
+      <hr />} */
+       <div className="create-minyan-page">
+    <form className="create-minyan-form" onSubmit={handleCreateMinyan}>
       <h2>צור מניין</h2>
-<form className="create-minyan-form" onSubmit={handleCreateMinyan}>
-  <div>
-  <label>תאריך ושעה: </label>
-  <input
-    type="datetime-local"
-       min={getNowDateTimeLocal()}
-    value={time}
-    onChange={(e) => setTime(e.target.value)}
-    required
-  />
-</div>
 
+      <div>
+        <label>תאריך ושעה:</label>
+        <input
+          type="datetime-local"
+          min={getNowDateTimeLocal()}
+          value={time}
+          onChange={(e) => setTime(e.target.value)}
+          required
+        />
+      </div>
 
-        <div>
-          <label>
-            <input
-              type="radio"
-              checked={useCurrentLocation}
-              onChange={() => setUseCurrentLocation(true)}
-            /> השתמש במיקום הנוכחי
-          </label>
-          <button
-            type="button"
-            onClick={() => getUserLocation().then(setLocation)}
-            disabled={!useCurrentLocation}
-          >
-            קבל מיקום
-          </button>
-          {location && useCurrentLocation && (
-            <span> (Lat: {location.lat}, Lng: {location.lng})</span>
-          )}
-        </div>
-
-        <div>
-          <label> 
-            הזן כתובת
-            <input
-              type="radio"
-              checked={!useCurrentLocation}
-              onChange={() => setUseCurrentLocation(false)}
-            /> 
-           
-
-          </label>
+      <div>
+        <label>
           <input
-            type="text"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            disabled={useCurrentLocation}
-            placeholder="כתובת"
+            type="radio"
+            checked={useCurrentLocation}
+            onChange={() => setUseCurrentLocation(true)}
           />
-        </div>
+          השתמש במיקום הנוכחי
+        </label>
+        <button
+          type="button"
+          onClick={() => getUserLocation().then(setLocation)}
+          disabled={!useCurrentLocation}
+        >
+          קבל מיקום
+        </button>
+        {location && useCurrentLocation && (
+          <span>(Lat: {location.lat}, Lng: {location.lng})</span>
+        )}
+      </div>
 
-        {error && <div style={{ color: 'red' }}>{error}</div>}
-        {success && <div style={{ color: 'green' }}>{success}</div>}
-        <button type="submit">צור מניין</button>
-      </form>
+      <div>
+        <label>
+          <input
+            type="radio"
+            checked={!useCurrentLocation}
+            onChange={() => setUseCurrentLocation(false)}
+          />
+          הזן כתובת
+        </label>
+        <input
+          type="text"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          disabled={useCurrentLocation}
+          placeholder="כתובת"
+        />
+      </div>
 
-      <Outlet />
-    </>
-  );
+      {error && <div className="error-message">{error}</div>}
+      {success && <div className="success-message">{success}</div>}
+
+      <button type="submit">צור מניין</button>
+    </form>
+
+    <Outlet />
+  </div>
+);
 }
 
 export default Create_Minyan;
