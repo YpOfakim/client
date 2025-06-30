@@ -40,7 +40,8 @@ function App() {
           </Route>
         </Route>
 
-        <Route path="*" element={<NoMatch />} />
+ <Route path="/404" element={<NoMatch />} />
+<Route path="*" element={<NoMatch />} />
       </Routes>
     </AuthProvider>
   );

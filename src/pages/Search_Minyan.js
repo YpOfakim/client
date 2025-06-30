@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Minyan from '../components/Minyan';
 import SortOptions from '../components/SortOptions';
+import { useParams, Navigate,useNavigate } from 'react-router-dom';
 
 function Search_Minyans() {
   const [minyans, setMinyans] = useState([]);
@@ -13,16 +14,24 @@ function Search_Minyans() {
   const [message, setMessage] = useState('');
   const [desiredTime, setDesiredTime] = useState(Date.now());
   const [sortBy, setSortBy] = useState('time');
-const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
   const limit = 4;
   const start = useRef(0);
   const containerRef = useRef(null);
-useEffect(() => {
-  if (userLocation) {
-    handleSearch();
-  }
-}, [userLocation]);
+const { userId } = useParams(); // מה-URL
+const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+  const navigate = useNavigate();
+
+if (!userInfo.user_id || String(userInfo.user_id) !== userId) {
+ navigate('/404'); // אם המשתמש לא מחובר או שה־userId לא תואם, נווט לעמוד 404
+}
+
+  useEffect(() => {
+    if (userLocation) {
+      handleSearch();
+    }
+  }, [userLocation]);
 
   // מיון בצד לקוח
   useEffect(() => {
@@ -70,7 +79,7 @@ useEffect(() => {
   // המרת כתובת לקורדינטות
   const fetchCoordsFromAddress = async (address) => {
     try {
-      const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=YOUR_API_KEY`);
+      const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=AIzaSyCVdsExOdchWIspVTLcCOgScugWBmgBllw`);
       const data = await res.json();
       if (data.status === "OK") {
         const location = data.results[0].geometry.location;
@@ -87,42 +96,50 @@ useEffect(() => {
   };
 
   // שליפת מניינים מהשרת
-  const fetchMinyans = async () => {
-    if (loading || !hasMore) return;
-    setLoading(true);
+const fetchMinyans = async () => {
+  if (loading || !hasMore) return;
+  setLoading(true);
 
-    try {
-      const url = new URL("http://localhost:3001/minyans");
-      url.searchParams.set("start", start.current);
-      url.searchParams.set("_limit", limit);
+  try {
+    const url = new URL("http://localhost:3001/minyans");
+    url.searchParams.set("start", start.current);
+    url.searchParams.set("_limit", limit);
 
-      const timeToUse = desiredTime && !isNaN(new Date(desiredTime)) ? new Date(desiredTime) : new Date();
-      url.searchParams.set("time_from", timeToUse.toISOString());
+    const timeToUse = desiredTime && !isNaN(new Date(desiredTime)) ? new Date(desiredTime) : new Date();
+    url.searchParams.set("time_from", timeToUse.toISOString());
 
-      const res = await fetch(url);
-      const json = await res.json();
-
-      if (json.length === 0 && start.current === 0) {
-        setMessage("לא נמצאו מניינים");
+    const res = await fetch(url, {
+      headers: {
+        "Authorization": `Bearer ${token}`
       }
-const newIds = new Set(json.map(m => m.id));
-const filtered = originalMinyans.filter(m => !newIds.has(m.id));
-const newCombined = [...filtered, ...json];
+    });
 
-      setOriginalMinyans(newCombined);
-      start.current += limit;
+    const json = await res.json();
 
-      if (json.length < limit) {
-        setHasMore(false);
-      }
-
-    } catch (err) {
-      console.error('Fetch error:', err);
-      setMessage("שגיאה בטעינת מניינים");
-    } finally {
-      setLoading(false);
+    if (json.length === 0 && start.current === 0) {
+      setMessage("לא נמצאו מניינים");
     }
-  };
+
+    const newIds = new Set(json.map(m => m.id));
+    const filtered = originalMinyans.filter(m => !newIds.has(m.id));
+    const newCombined = [...filtered, ...json];
+
+    setOriginalMinyans(newCombined);
+    start.current += limit;
+
+    if (json.length < limit) {
+      setHasMore(false);
+    }
+
+  } catch (err) {
+    console.error('Fetch error:', err);
+    setMessage("שגיאה בטעינת מניינים");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   // אינפיניט סקרול
   useEffect(() => {
