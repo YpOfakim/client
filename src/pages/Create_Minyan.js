@@ -57,7 +57,7 @@ function Create_Minyan() {
   const [time, setTime] = useState('');
   const [useCurrentLocation, setUseCurrentLocation] = useState(true);
   const [calcType, setCalcType] = useState('from-location');
-const token = localStorage.getItem("Token");
+const token = localStorage.getItem("token");
 
 
   useEffect(() => {
@@ -102,10 +102,12 @@ const handleCreateMinyan = async (e) => {
     return;
   }
 
-  const data = {
-    time,
-    opener_id: userId// מזהה המשתמש הפותח את המניין
-  };
+const data = {
+  time,
+  opener_id: userId
+
+};
+
 
   try {
     if (useCurrentLocation) {
@@ -123,6 +125,8 @@ const handleCreateMinyan = async (e) => {
       data.address = address;  // שולח כתובת
       data.location = null;
     }
+console.log("Token from localStorage:", token);
+console.log("Data:", data);
 
     const res = await fetch('http://localhost:3001/minyans', {
       method: 'POST',
@@ -252,12 +256,15 @@ const handleCreateMinyan = async (e) => {
         </div>
 
         <div>
-          <label>
+          <label> 
+            הזן כתובת
             <input
               type="radio"
               checked={!useCurrentLocation}
               onChange={() => setUseCurrentLocation(false)}
-            /> הזן כתובת
+            /> 
+           
+
           </label>
           <input
             type="text"
