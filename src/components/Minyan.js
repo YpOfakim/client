@@ -2,37 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import RouteMap from './RouteMap';
 
-async function getDistanceAndDuration(origin, destination, mode = 'driving') {
-  const originStr = `${origin.lat},${origin.lng}`;
-  const destinationStr = `${destination.lat},${destination.lng}`;
-  const url = `http://localhost:3001/geocode/distance?origin=${encodeURIComponent(originStr)}&destination=${encodeURIComponent(destinationStr)}&mode=${mode}`;
+import { getDistanceAndDuration,formatDateTime } from '../helpers/helpers';
 
-  const res = await fetch(url);
-  const data = await res.json();
-  if (data.status === 'OK' && data.rows[0].elements[0].status === 'OK') {
-    const element = data.rows[0].elements[0];
-    return {
-      distance: element.distance.text,
-      duration: element.duration.text,
-      durationValue: element.duration.value,
-    };
-  } else {
-    throw new Error('Failed to calculate distance');
-  }
-}
 
-function formatDateTime(datetimeStr) {
-  const options = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  };
-  return new Date(datetimeStr).toLocaleString('he-IL', options);
-}
+
 
 function Minyan({ minyan, userLocation, departureTime }) {
   const [walkInfo, setWalkInfo] = useState(null);
@@ -182,13 +155,16 @@ useEffect(() => {
       }
 
       const result = await res.json();
-      if (result && (result.success || result.id)) {
-        setIsJoined(true);
-        setJoinCount(prev => (isJoined ? prev - 1 : (prev !== null ? prev + 1 : 1)));
-        setError('');
-      } else {
-        setError('שגיאה בהצטרפות למניין');
-      }
+
+console.log("תשובת שרת:", result);
+if (result && result.prayersInMinyan_id) {
+  setIsJoined(true);
+  setJoinCount(prev => (isJoined ? prev - 1 : (prev !== null ? prev + 1 : 1)));
+  setError('');
+} else {
+  setError('שגיאה בהצטרפות למניין');
+}
+
     } catch (err) {
       setError('שגיאה בהצטרפות למניין: ' + (err.message || err));
     }
@@ -226,7 +202,9 @@ useEffect(() => {
           <input type="radio" value="walking" checked={travelMode === 'walking'} onChange={() => setTravelMode('walking')} /> הליכה
         </label>
       </div>
-
+{!isJoined && user_id !== minyan.opener_id && (
+  <button onClick={handleAddToMinyan}>הצטרפות</button>
+)}
 {isJoined && user_id !== minyan.opener_id && (
   <button onClick={handleCancelJoin}>בטל הצטרפות</button>
 )}
