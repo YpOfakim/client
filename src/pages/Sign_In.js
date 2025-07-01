@@ -5,7 +5,7 @@ import { useContext } from "react";
 import { AuthContext } from "../App"; 
 import "../style/login.css"; 
 function Login() {
-  // ניקוי נתונים קודמים מה־localStorage
+  // ניקוי נתונים קודמים מה־ localStorage
   useEffect(() => {
     localStorage.removeItem("token");
     localStorage.removeItem("userInfo");
