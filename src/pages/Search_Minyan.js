@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import Minyan from '../components/Minyan';
 import SortOptions from '../components/SortOptions';
 import { useParams, Navigate,useNavigate } from 'react-router-dom';
+import "../style/minyan-list.css";
+
 
 function Search_Minyans() {
   const [minyans, setMinyans] = useState([]);
@@ -170,29 +172,24 @@ const fetchMinyans = async () => {
     return now.toISOString().slice(0, 16);
   };
 
-  return (
-    <div>
-      <h2 style={{ textAlign: 'center' }}>מניינים קיימים</h2>
+return (
+  <div className="minyan-list-page">
+    <div className="minyan-list-container">
+      <h2>מניינים קיימים</h2>
 
-      {/* סינון לפי זמן */}
-      <div style={{ textAlign: 'center', margin: '1em' }}>
-        <label>מניין לזמן מסוים:&nbsp;</label>
+      <div style={{ textAlign: 'center', marginBottom: '1em' }}>
+        <label>מניין לזמן מסוים:</label>
         <input
           type="datetime-local"
           value={desiredTime || ''}
           min={getNowDateTimeLocal()}
-          onChange={(e) => {
-            setDesiredTime(e.target.value);
-          }}
-          style={{ padding: '0.3em' }}
+          onChange={(e) => setDesiredTime(e.target.value)}
         />
       </div>
 
-      {/* סינון לפי מרחק / זמן */}
       <SortOptions sortBy={sortBy} setSortBy={setSortBy} />
 
-      {/* מיקום נוכחי או ידני */}
-      <div style={{ textAlign: 'center', margin: '1em' }}>
+      <div style={{ textAlign: 'center', marginBottom: '1em' }}>
         <label>
           <input
             type="radio"
@@ -201,7 +198,7 @@ const fetchMinyans = async () => {
             checked={locationMode === "current"}
             onChange={() => setLocationMode("current")}
           />
-          &nbsp;המיקום הנוכחי שלי
+          המיקום הנוכחי שלי
         </label>
         &nbsp;&nbsp;
         <label>
@@ -212,38 +209,28 @@ const fetchMinyans = async () => {
             checked={locationMode === "manual"}
             onChange={() => setLocationMode("manual")}
           />
-          &nbsp;כתובת אחרת
+          כתובת אחרת
         </label>
-        {locationMode === "manual" && (
-          <div style={{ marginTop: '0.5em' }}>
-            <input
-              type="text"
-              placeholder="לדוגמה: הרצל 10, תל אביב"
-              value={manualAddress}
-              onChange={(e) => setManualAddress(e.target.value)}
-              style={{ padding: '0.3em', width: '60%' }}
-            />
-          </div>
-        )}
-        <div style={{ marginTop: '1em' }}>
-          <button onClick={handleSearch}>🔍 חפש</button>
-        </div>
+
+{locationMode === "manual" && (
+  <div style={{ marginTop: '0.5em' }}>
+    <input
+      type="text"
+      placeholder="לדוגמה: הרצל 10, תל אביב"
+      value={manualAddress}
+      onChange={(e) => setManualAddress(e.target.value)}
+    />
+  </div>
+)}
+
+<div style={{ marginTop: '1em' }}>
+  <button onClick={handleSearch}>🔍 חפש</button>
+</div>
       </div>
 
-      {/* הודעות */}
-      {message && <div style={{ color: 'red', textAlign: 'center' }}>{message}</div>}
+      {message && <div className="message">{message}</div>}
 
-      {/* רשימת מניינים */}
-      <div
-        ref={containerRef}
-        className="minyans-container"
-        style={{
-          overflowY: 'scroll',
-          height: '80vh',
-          border: '1px solid #ccc',
-          padding: '1em',
-        }}
-      >
+      <div ref={containerRef} className="minyans-container">
         {minyans.length === 0 && !loading && !message && <p>לא נמצאו מניינים</p>}
 
         {minyans.map((minyan, index) => (
@@ -259,7 +246,7 @@ const fetchMinyans = async () => {
         {!hasMore && <div style={{ textAlign: 'center', marginTop: '1em' }}>אין עוד מניינים</div>}
       </div>
     </div>
-  );
-}
+  </div>
+);}
 
 export default Search_Minyans;
