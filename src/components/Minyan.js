@@ -197,8 +197,8 @@ useEffect(() => {
   const fullyMissed = missesWalk && missesDrive;
 
   return (
-    <div className="minyan" style={{ border: '1px solid #ccc', padding: '1em', marginBottom: '1em', backgroundColor: fullyMissed ? '#e0e0e0' : 'white', opacity: fullyMissed ? 0.6 : 1, pointerEvents: fullyMissed ? 'none' : 'auto' }}>
-      <h4>🕒 {formatDateTime(minyan.time_and_date)}</h4>
+       <div className={`minyan ${fullyMissed ? 'fully-missed' : ''}`}>
+          <h4>🕒 {formatDateTime(minyan.time_and_date)}</h4>
             <p>
         מנהל המניין:{" "}
         {openerInfo

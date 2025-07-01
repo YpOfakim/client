@@ -76,3 +76,98 @@
   text-align: center;
   margin-top: 1rem;
 }
+.minyan {
+  border: 2px solid #c7a17a;
+  border-radius: 12px;
+  background-color: #fffdf8;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(199, 161, 122, 0.15);
+  color: #4b3b2b;
+  font-family: 'Almoni DL', sans-serif;
+  direction: rtl;
+  transition: background-color 0.3s ease, opacity 0.3s ease;
+}
+
+.minyan.fully-missed {
+  background-color: #e0e0e0;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.minyan h4 {
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+  color: #a9845c;
+}
+
+.minyan p {
+  margin: 0.3rem 0;
+  line-height: 1.4;
+  font-size: 1rem;
+}
+
+.minyan p span {
+  font-weight: 600;
+}
+
+.minyan p[style*="color: green"] {
+  font-weight: 600;
+}
+
+.minyan p[style*="color: red"] {
+  font-weight: 600;
+}
+
+.minyan label {
+  cursor: pointer;
+  font-weight: 600;
+  user-select: none;
+  margin-right: 1rem;
+  font-size: 0.95rem;
+  color: #624119;
+}
+
+.minyan input[type="radio"] {
+  margin-left: 0.5rem;
+  cursor: pointer;
+}
+
+.minyan button {
+  background-color: #a9845c;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.2rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 0.5rem 0.3rem 0 0;
+  transition: background-color 0.3s ease;
+  font-size: 1rem;
+}
+
+.minyan button:hover {
+  background-color: #8b6a4f;
+}
+
+.minyan button:last-of-type {
+  background-color: #6b513a;
+}
+
+.minyan button:last-of-type:hover {
+  background-color: #57422e;
+}
+
+.minyan p.error-message {
+  color: #cc0000;
+  font-weight: 700;
+  margin-top: 0.5rem;
+}
+
+/* למפה - מעט ריווח */
+.minyan .map-container {
+  margin-top: 1rem;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(199, 161, 122, 0.2);
+}
