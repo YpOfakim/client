@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../style/register.css'; 
+import { useContext } from 'react';
+import { AuthContext } from '../App';
 
 
 function Register() {
@@ -16,6 +18,7 @@ function Register() {
   });
 
   const navigate = useNavigate();
+const { onLogin } = useContext(AuthContext);
 
   // ניקוי לוקאל סטורג' בעת טעינה
   useEffect(() => {
@@ -47,7 +50,10 @@ function Register() {
       showMessage("הסיסמה חייבת להכיל לפחות 6 תווים");
       return;
     }
-
+if (newUserData.user_userName.length < 3) {
+  showMessage("שם המשתמש חייב להכיל לפחות 3 תווים");
+  return;
+}
     if (newUserData.phone && !/^\d{9,10}$/.test(newUserData.phone)) {
       showMessage("מספר טלפון לא תקין");
       return;
@@ -71,8 +77,10 @@ function Register() {
 
       localStorage.setItem('token', token);
       localStorage.setItem('userInfo', JSON.stringify(user));
+console.log("Navigate to: ", `/user/${user.user_id}/home`);
+onLogin(token, user);
 
-      navigate(`/user/${user.user_id}/home`);
+
     } catch (err) {
       console.error("שגיאה ברישום:", err);
       showMessage("שגיאת שרת: נסה שוב מאוחר יותר");
