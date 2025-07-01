@@ -53,6 +53,9 @@ const { onLogin } = useContext(AuthContext);
 if (newUserData.user_userName.length < 3) {
   showMessage("שם המשתמש חייב להכיל לפחות 3 תווים");
   return;
+}if (newUserData.user_name.length < 3) {
+  showMessage("שם המשתמש חייב להכיל לפחות 3 תווים");
+  return;
 }
     if (newUserData.phone && !/^\d{9,10}$/.test(newUserData.phone)) {
       showMessage("מספר טלפון לא תקין");

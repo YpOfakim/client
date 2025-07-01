@@ -173,7 +173,11 @@ if (result && result.prayersInMinyan_id) {
   const fullyMissed = missesWalk && missesDrive;
 
   return (
+    
        <div className={`minyan ${fullyMissed ? 'fully-missed' : ''}`}>
+        {user_id == minyan.opener_id && (
+  <p >המניין שלך:</p>
+)}
           <h4>🕒 {formatDateTime(minyan.time_and_date)}</h4>
             <p>
         מנהל המניין:{" "}
