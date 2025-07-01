@@ -227,8 +227,9 @@ useEffect(() => {
         </label>
       </div>
 
-      {isJoined ? <button onClick={handleCancelJoin}>בטל הצטרפות</button> : <button onClick={handleAddToMinyan}>הצטרף למניין</button>}
-
+{isJoined && user_id !== minyan.opener_id && (
+  <button onClick={handleCancelJoin}>בטל הצטרפות</button>
+)}
       <button onClick={() => setShowMap(prev => !prev)}>{showMap ? 'הסתר מפה' : 'צפה במסלול'}</button>
 
       {error && <p style={{ color: 'red' }}>{error}</p>}

@@ -17,6 +17,7 @@ function Search_Minyans() {
   const [desiredTime, setDesiredTime] = useState(Date.now());
   const [sortBy, setSortBy] = useState('time');
   const token = localStorage.getItem("token");
+const [shouldFetchMinyans, setShouldFetchMinyans] = useState(false);
 
   const limit = 4;
   const start = useRef(0);
@@ -64,19 +65,27 @@ if (!userInfo.user_id || String(userInfo.user_id) !== userId) {
   }, [locationMode]);
 
   // חיפוש כללי
-  const handleSearch = async () => {
-    setMinyans([]);
-    setOriginalMinyans([]);
-    setHasMore(true);
-    start.current = 0;
+const handleSearch = async () => {
+  setMinyans([]);
+  setOriginalMinyans([]);
+  setHasMore(true);
+  start.current = 0;
 
-    if (locationMode === "manual") {
-      const ok = await fetchCoordsFromAddress(manualAddress);
-      if (!ok) return;
-    }
+  if (locationMode === "manual") {
+    const ok = await fetchCoordsFromAddress(manualAddress);
+    if (!ok) return;
+    setShouldFetchMinyans(true); // תאפשר את הקריאה כשהכתובת הוזנה בהצלחה
+  } else {
+    setShouldFetchMinyans(true); // מיקום נוכחי
+  }
+};
+useEffect(() => {
+  if (shouldFetchMinyans && userLocation) {
+    fetchMinyans();
+    setShouldFetchMinyans(false); // לנקות כדי למנוע קריאות חוזרות
+  }
+}, [shouldFetchMinyans, userLocation]);
 
-    await fetchMinyans();
-  };
 
   // המרת כתובת לקורדינטות
   const fetchCoordsFromAddress = async (address) => {

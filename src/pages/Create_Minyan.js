@@ -136,7 +136,7 @@ console.log("Data:", data);
   },
       body: JSON.stringify(data),
     });
-
+console.log("Sending location:", data.location);
     if (res.ok) {
       setSuccess('מניין נוצר בהצלחה!');
       setTime('');
