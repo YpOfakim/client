@@ -73,7 +73,8 @@ function Register() {
       localStorage.setItem('userInfo', JSON.stringify(user));
 
       navigate(`/user/${user.user_id}/home`);
-    } catch (err) {
+    } 
+    catch (err) {
       console.error("שגיאה ברישום:", err);
       showMessage("שגיאת שרת: נסה שוב מאוחר יותר");
     }
