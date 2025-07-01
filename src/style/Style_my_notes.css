@@ -11,11 +11,8 @@
 
 .add-note-section {
   flex: 1;
-  /* background-color: #fef9f0; רקע בהיר יותר */
-  /* border: 2px solid #c7a17a; */  /* מסגרת בגוון חום חמים - הוסר */
   border-radius: 12px;
   padding: 20px;
-  /* box-shadow: 0 2px 8px rgba(199, 161, 122, 0.4); */ /* הוסר */
 }
 
 .notes-list-section {
@@ -63,7 +60,7 @@
 }
 
 .note-title-item:hover {
-  background-color: #cebdab; 
+  background-color: #cebdab;
   color: #2e1f0f;
 }
 
@@ -77,29 +74,69 @@
 .selected-note-body {
   margin-top: 24px;
   padding: 16px;
-  border: none;
   border-radius: 12px;
-  background:#cebdab; 
-  box-shadow: none; 
+  background: #cebdab;
   max-height: 280px;
   overflow-y: auto;
   direction: rtl;
   color: #624119;
 }
 
+/* כותרת העריכה */
 .selected-note-body h4 {
   margin-bottom: 10px;
   font-weight: 600;
 }
 
+/* תוכן הפתק */
 .note-body {
   padding: 10px;
   border: 1px solid #c7a17a;
   border-radius: 8px;
   background: #fdf5e6;
-  max-height: 220px;  
+  max-height: 220px;
   overflow-y: auto;
   line-height: 1.5;
+}
+
+/* עיצוב input ו-textarea בתוך העריכה */
+.selected-note-body input[type="text"],
+.selected-note-body textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border: 1px solid #c7a17a;
+  border-radius: 8px;
+  background-color: #fdf5e6;
+  color: #4b3b2b;
+  font-family: inherit;
+  font-size: 1rem;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.selected-note-body input[type="text"]:focus,
+.selected-note-body textarea:focus {
+  outline: none;
+  border-color: #a67c52;
+  box-shadow: 0 0 6px rgba(166, 124, 82, 0.6);
+}
+
+/* עיצוב כפתורים בתוך העריכה */
+.selected-note-body button {
+  background-color: #a67c52;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  margin-right: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 1rem;
+}
+
+.selected-note-body button:hover {
+  background-color: #8b6a3f;
 }
 
 /* Scrollbar - קלאסי ונעים */
@@ -119,7 +156,7 @@
 .notes-list-box::-webkit-scrollbar-thumb,
 .selected-note-body::-webkit-scrollbar-thumb,
 .note-body::-webkit-scrollbar-thumb {
-  background-color: #cebdab; 
+  background-color: #cebdab;
   border-radius: 8px;
   border: 2px solid #f5f0e6;
 }
