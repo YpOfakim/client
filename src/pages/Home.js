@@ -30,4 +30,3 @@ console.log("userInfo in Home:", userInfo);
 }
 
 export default Home;
-//המניינים והחיזוקים והפתקים די אותו הדבר לבדוק אופציה לקומפוננטה  משותפת
